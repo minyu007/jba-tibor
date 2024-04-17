@@ -9,13 +9,50 @@ from email.mime.image import MIMEImage
 import matplotlib.pyplot as plt
 
 
+
+
 def send_email(sender_email, sender_password, recipient_email, subject, body, attachments=None):
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = recipient_email
     msg['Subject'] = subject
-
-    msg.attach(MIMEText(body, 'html'))
+    css='''
+        <style>
+        .table{
+            border-collapse: collapse;
+            width:100%;
+            border:1px solid #c6c6c6 !important;
+            margin-bottom:20px;
+        }
+        .table th{
+            border-collapse: collapse;
+            border-right:1px solid #c6c6c6 !important;
+            border-bottom:1px solid #c6c6c6 !important;
+            background-color:#ddeeff !important; 
+            padding:5px 9px;
+            font-size:14px;
+            font-weight:normal;
+            text-align:center;
+        }
+        .table td{
+            border-collapse: collapse;
+            border-right:1px solid #c6c6c6 !important;
+            border-bottom:1px solid #c6c6c6 !important; 
+            padding:5px 9px;
+            font-size:12px;
+            font-weight:normal;
+            text-align:center;
+            word-break: break-all;
+        }
+        .table tr:nth-child(odd){
+            background-color:#fff !important; 
+        }
+        .table tr:nth-child(even){
+            background-color: #f8f8f8 !important;
+        }
+        </style>
+    '''
+    msg.attach(MIMEText(css+body, 'html'))
 
     if attachments:
         for attachment in attachments:
@@ -29,13 +66,15 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
 
 
 def calculate_change(df):
-    change_message = ""
+    change_list = []
     for column in df.columns:
         change = df[column].iloc[0] - df[column].iloc[1]
         if abs(change) > 0.001:
-            change_message += f"{column},"
-    change_message += f" change more than 0.1%"
-    return change_message
+            change_list.append(column)
+    
+    return change_list
+
+
 
 
 try:
@@ -56,22 +95,7 @@ try:
     html_table = df.to_html(border=1)
     df.fillna(0, inplace=True)
 
-    # plt.figure(figsize=(10, 6))
-    # plt.table(cellText=df.values, colLabels=df.columns, rowLabels=df.index.strftime(
-    #     '%Y-%m-%d'), loc='center', cellLoc='center')
-    # plt.axis('off')
-    # plt.title('Table Image 1', fontsize=16)
-    # plt.savefig('table_image.png')
-
-    # plt.figure(figsize=(10, 6))
-    # for column in df.columns:
-    #     plt.plot(df.index, df[column], label=column)
-    # plt.xlabel('Date')
-    # plt.ylabel('Value')
-    # plt.title('Line Chart Image 2')
-    # plt.legend()
-    # plt.savefig('line_chart_image.png')
-    # html_table = df.to_html()
+    
     sender_email = "chengguoyu_82@163.com"
     sender_password = "SSJTQGALEZMNHNGE"
     recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
@@ -81,8 +105,12 @@ try:
 
     # attachments = ['table_image.png', 'line_chart_image.png']
     attachments = []
-    change_message = calculate_change(df)
-    if change_message != " change more than 0.1%":
+    
+    
+    change_list = calculate_change(df)
+    # change_message = ""
+    if len(change_list) > 0:
+        change_message = f",".join(change_list) + " change more than 0.1%"
         body += f"**<font color='red'><b>{change_message}</b></font>**"
 
     send_email(sender_email, sender_password, ','.join(
