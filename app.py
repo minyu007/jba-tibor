@@ -15,7 +15,7 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
     msg['To'] = recipient_email
     msg['Subject'] = subject
 
-    msg.attach(MIMEText(body, 'plain'))
+    msg.attach(MIMEText(body, 'html'))
 
     if attachments:
         for attachment in attachments:
