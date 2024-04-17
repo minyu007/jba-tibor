@@ -53,7 +53,7 @@ try:
 
     df.set_index(df.columns[0], inplace=True)
     df.index.rename('date', inplace=True)
-
+    html_table = df.to_html()
     df.fillna(0, inplace=True)
 
     # plt.figure(figsize=(10, 6))
@@ -71,12 +71,12 @@ try:
     # plt.title('Line Chart Image 2')
     # plt.legend()
     # plt.savefig('line_chart_image.png')
-
+    # html_table = df.to_html()
     sender_email = "chengguoyu_82@163.com"
     sender_password = "SSJTQGALEZMNHNGE"
     recipient_emails = ["wo_oplove@163.com", "13889632722@163.com"]
     subject = "Japanese Yen TIBOR"
-    body = "<p>Hi All, </p><br/><p>Please see the attached charts.</p><br/><p>refer to the link for more information <a href='" + \
+    body = "<p>Hi All, </p><br/><p>Please see the attached charts.</p><br/><div>"+html_table+"</div><br/><p>refer to the link for more information <a href='" + \
         base_url+"' target='_blank'>click me!</a></p><br/>"
 
     # attachments = ['table_image.png', 'line_chart_image.png']
