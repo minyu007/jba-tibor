@@ -75,10 +75,10 @@ plt.savefig('line_chart_image.png')
 
 sender_email = "chengguoyu_82@163.com"
 sender_password = "SSJTQGALEZMNHNGE"
-recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
-subject = "Today's Rate"
+recipient_emails = ["wo_oplove@163.com", "13889632722@163.com"]
+subject = "Japanese Yen TIBOR"
 body = "<p>Hi, </p><br/><p>Please see the attached charts.</p><br/><p>refer to the link for more information <a href='" + \
-    "http://baidu.com"+"' target='_blank'>click me!</a><br/>"
+    "http://baidu.com"+"' target='_blank'>click me!</a></p><br/>"
 
 attachments = ['table_image.png', 'line_chart_image.png']
 
