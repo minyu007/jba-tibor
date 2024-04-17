@@ -56,21 +56,21 @@ try:
 
     df.fillna(0, inplace=True)
 
-    plt.figure(figsize=(10, 6))
-    plt.table(cellText=df.values, colLabels=df.columns, rowLabels=df.index.strftime(
-        '%Y-%m-%d'), loc='center', cellLoc='center')
-    plt.axis('off')
-    plt.title('Table Image 1', fontsize=16)
-    plt.savefig('table_image.png')
+    # plt.figure(figsize=(10, 6))
+    # plt.table(cellText=df.values, colLabels=df.columns, rowLabels=df.index.strftime(
+    #     '%Y-%m-%d'), loc='center', cellLoc='center')
+    # plt.axis('off')
+    # plt.title('Table Image 1', fontsize=16)
+    # plt.savefig('table_image.png')
 
-    plt.figure(figsize=(10, 6))
-    for column in df.columns:
-        plt.plot(df.index, df[column], label=column)
-    plt.xlabel('Date')
-    plt.ylabel('Value')
-    plt.title('Line Chart Image 2')
-    plt.legend()
-    plt.savefig('line_chart_image.png')
+    # plt.figure(figsize=(10, 6))
+    # for column in df.columns:
+    #     plt.plot(df.index, df[column], label=column)
+    # plt.xlabel('Date')
+    # plt.ylabel('Value')
+    # plt.title('Line Chart Image 2')
+    # plt.legend()
+    # plt.savefig('line_chart_image.png')
 
     sender_email = "chengguoyu_82@163.com"
     sender_password = "SSJTQGALEZMNHNGE"
@@ -79,8 +79,8 @@ try:
     body = "<p>Hi All, </p><br/><p>Please see the attached charts.</p><br/><p>refer to the link for more information <a href='" + \
         base_url+"' target='_blank'>click me!</a></p><br/>"
 
-    attachments = ['table_image.png', 'line_chart_image.png']
-
+    # attachments = ['table_image.png', 'line_chart_image.png']
+    attachments = []
     change_message = calculate_change(df)
     if change_message:
         body += f"**<font color='red'><b>{change_message}</b></font>**"
