@@ -1,30 +1,14 @@
+import requests
 import pandas as pd
+from datetime import datetime
+import tabula
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from datetime import datetime
 from email.mime.image import MIMEImage
 import matplotlib.pyplot as plt
 
-# 创建示例 DataFrame
-data = {
-    '1WEEK': [0.02, 0.02, 0.01],
-    '1MONTH': [0.06, 0.06, 0.07],
-    '2MONTH': [None, None, None],
-    '3MONTH': [0.08, 0.09, 0.1],
-    '4MONTH': [None, None, None],
-    '5MONTH': [None, None, None],
-    '6MONTH': [0.15, 0.16, 0.14],
-    '7MONTH': [None, None, None],
-    '8MONTH': [None, None, None],
-    '9MONTH': [None, None, None],
-    '10MONTH': [None, None, None],
-    '11MONTH': [None, None, None],
-    '12MONTH': [0.2, 0.21, 0.22]
-}
-dates = pd.date_range(start='2024-04-01', periods=3, freq='D')
-df = pd.DataFrame(data, index=dates)
-df.fillna(0, inplace=True)
+
 
 
 def send_email(sender_email, sender_password, recipient_email, subject, body, attachments=None):
@@ -91,28 +75,48 @@ def calculate_change(df):
     return change_list
 
 
-html_table = df.fillna('').to_html(border=1)
-df.fillna(0, inplace=True)
 
 
-sender_email = "chengguoyu_82@163.com"
-sender_password = "SSJTQGALEZMNHNGE"
-recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
-subject = "Japanese Yen TIBOR"
-body = "<p>Download PDF <a href='" + \
-    "dd"+"' target='_blank'>click me!</a></p><br/><div>"+html_table+"</div><br/>"
+try:
+    current_date = datetime.now().strftime("%y%m%d")
 
-# attachments = ['table_image.png', 'line_chart_image.png']
-attachments = []
+    base_url = "https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{}.pdf"
 
+    pdf_url = base_url.format(current_date)
 
-change_list = calculate_change(df)
-# change_message = ""
-if len(change_list) > 0:
-    change_message = f", ".join(change_list) + " change by more than 0.1%"
-    body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
+    tables = tabula.read_pdf(pdf_url, pages="all")
 
-send_email(sender_email, sender_password, ','.join(
-    recipient_emails), subject, body, attachments)
+    dfs = [pd.DataFrame(table) for table in tables]
 
-print(df)
+    df = pd.concat(dfs, ignore_index=True)
+
+    df.set_index(df.columns[0], inplace=True)
+    df.index.rename('date', inplace=True)
+    html_table = df.fillna('').to_html(border=1)
+    df.fillna(0, inplace=True)
+
+    
+    sender_email = "chengguoyu_82@163.com"
+    sender_password = "SSJTQGALEZMNHNGE"
+    recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
+    subject = "Japanese Yen TIBOR"
+    body = "<p>Download PDF <a href='" + \
+        "dd"+"' target='_blank'>click me!</a></p><br/><div>"+html_table+"</div><br/>"
+
+    # attachments = ['table_image.png', 'line_chart_image.png']
+    attachments = []
+    
+    
+    change_list = calculate_change(df)
+    # change_message = ""
+    if len(change_list) > 0:
+        change_message = f", ".join(change_list) + " change by more than 0.1%"
+        body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
+
+    send_email(sender_email, sender_password, ','.join(
+        recipient_emails), subject, body, attachments)
+
+    print(df)
+
+except Exception as e:
+    print("running into an error:", e)
