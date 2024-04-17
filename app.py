@@ -92,7 +92,7 @@ try:
 
     df.set_index(df.columns[0], inplace=True)
     df.index.rename('date', inplace=True)
-    html_table = df.to_html(border=1)
+    html_table = df.fillna('').to_html(border=1)
     df.fillna(0, inplace=True)
 
     
@@ -101,7 +101,7 @@ try:
     recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
     subject = "Japanese Yen TIBOR"
     body = "<p>Hi All, </p><br/><div>"+html_table+"</div><br/><p>refer to the link for more information <a href='" + \
-        base_url+"' target='_blank'>click me!</a></p><br/>"
+        pdf_url+"' target='_blank'>click me!</a></p><br/>"
 
     # attachments = ['table_image.png', 'line_chart_image.png']
     attachments = []
