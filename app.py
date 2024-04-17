@@ -34,7 +34,7 @@ def calculate_change(df):
         change = df[column].iloc[0] - df[column].iloc[1]
         if abs(change) > 0.001:
             change_message += f"{column},"
-    change_message += f" change more than 0.1%\n"
+    change_message += f" change more than 0.1%"
     return change_message
 
 
@@ -82,7 +82,7 @@ try:
     # attachments = ['table_image.png', 'line_chart_image.png']
     attachments = []
     change_message = calculate_change(df)
-    if change_message:
+    if change_message != " change more than 0.1%":
         body += f"**<font color='red'><b>{change_message}</b></font>**"
 
     send_email(sender_email, sender_password, ','.join(
