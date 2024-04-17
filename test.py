@@ -77,7 +77,7 @@ html_table = df.to_html(border=1)
 
 sender_email = "chengguoyu_82@163.com"
 sender_password = "SSJTQGALEZMNHNGE"
-recipient_emails = ["wo_oplove@163.com", "13889632722@163.com"]
+recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
 subject = "Japanese Yen TIBOR"
 body = "<p>Hi, </p><br/><div>"+html_table+"</div><p>refer to the link for more information <a href='" + \
     "https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR240417.pdf" + \

@@ -74,7 +74,7 @@ try:
     # html_table = df.to_html()
     sender_email = "chengguoyu_82@163.com"
     sender_password = "SSJTQGALEZMNHNGE"
-    recipient_emails = ["wo_oplove@163.com", "13889632722@163.com"]
+    recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
     subject = "Japanese Yen TIBOR"
     body = "<p>Hi All, </p><br/><div>"+html_table+"</div><br/><p>refer to the link for more information <a href='" + \
         base_url+"' target='_blank'>click me!</a></p><br/>"
