@@ -110,8 +110,8 @@ try:
     change_list = calculate_change(df)
     # change_message = ""
     if len(change_list) > 0:
-        change_message = f",".join(change_list) + " change more than 0.1%"
-        body = f"**<h2><font color='red'><b>Please note: {change_message}</b></font></h2>**<br/>" + body
+        change_message = f",".join(change_list) + " change by more than 0.1%"
+        body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
 
     send_email(sender_email, sender_password, ','.join(
         recipient_emails), subject, body, attachments)
