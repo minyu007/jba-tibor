@@ -17,7 +17,7 @@ final_df = pd.concat(dfs, ignore_index=True)
 
 # excel_filename = "output.xlsx"
 # final_df.to_excel(excel_filename, index=False)
-final_df.set_index(df.columns[0], inplace=True)
+final_df.set_index(final_df.columns[0], inplace=True)
 final_df.index.rename('date', inplace=True)
 
 print(final_df)
