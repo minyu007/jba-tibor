@@ -18,13 +18,13 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
     msg['Subject'] = subject
     css='''
         <style>
-        .table{
+        table{
             border-collapse: collapse;
             width:100%;
             border:1px solid #c6c6c6 !important;
             margin-bottom:20px;
         }
-        .table th{
+        table th{
             border-collapse: collapse;
             border-right:1px solid #c6c6c6 !important;
             border-bottom:1px solid #c6c6c6 !important;
@@ -34,7 +34,7 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
             font-weight:normal;
             text-align:center;
         }
-        .table td{
+        table td{
             border-collapse: collapse;
             border-right:1px solid #c6c6c6 !important;
             border-bottom:1px solid #c6c6c6 !important; 
@@ -44,10 +44,10 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
             text-align:center;
             word-break: break-all;
         }
-        .table tr:nth-child(odd){
+        table tr:nth-child(odd){
             background-color:#fff !important; 
         }
-        .table tr:nth-child(even){
+        table tr:nth-child(even){
             background-color: #f8f8f8 !important;
         }
         </style>
