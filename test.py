@@ -32,8 +32,43 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
     msg['From'] = sender_email
     msg['To'] = recipient_email
     msg['Subject'] = subject
-
-    msg.attach(MIMEText(body, 'html'))
+    css='''
+        <style>
+        table{
+            border-collapse: collapse;
+            width:100%;
+            border:1px solid #c6c6c6 !important;
+            margin-bottom:20px;
+        }
+        table th{
+            border-collapse: collapse;
+            border-right:1px solid #c6c6c6 !important;
+            border-bottom:1px solid #c6c6c6 !important;
+            background-color:#ddeeff !important; 
+            padding:5px 9px;
+            font-size:14px;
+            font-weight:normal;
+            text-align:center;
+        }
+        table td{
+            border-collapse: collapse;
+            border-right:1px solid #c6c6c6 !important;
+            border-bottom:1px solid #c6c6c6 !important; 
+            padding:5px 9px;
+            font-size:12px;
+            font-weight:normal;
+            text-align:center;
+            word-break: break-all;
+        }
+        table tr:nth-child(odd){
+            background-color:#fff !important; 
+        }
+        table tr:nth-child(even){
+            background-color: #f8f8f8 !important;
+        }
+        </style>
+    '''
+    msg.attach(MIMEText(css+body, 'html'))
 
     if attachments:
         for attachment in attachments:
@@ -47,13 +82,13 @@ def send_email(sender_email, sender_password, recipient_email, subject, body, at
 
 
 def calculate_change(df):
-    change_message = ""
+    change_list = []
     for column in df.columns:
         change = df[column].iloc[0] - df[column].iloc[1]
         if abs(change) > 0.001:
-            change_message += f"{column},"
-    change_message += f" change more than 0.1%\n"
-    return change_message
+            change_list.append(column)
+    
+    return change_list
 
 
 html_table = df.fillna('').to_html(border=1)
