@@ -80,9 +80,9 @@ def calculate_change(df):
 try:
     current_date = datetime.now().strftime("%y%m%d")
 
-    base_url = "https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{}.pdf"
+    # base_url = "https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{}.pdf"
 
-    pdf_url = base_url.format(current_date)
+    pdf_url = "https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR240417.pdf"
 
     tables = tabula.read_pdf(pdf_url, pages="all")
 
