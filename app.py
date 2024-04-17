@@ -100,8 +100,8 @@ try:
     sender_password = "SSJTQGALEZMNHNGE"
     recipient_emails = ["zling@jenseninvest.com", "13889632722@163.com"]
     subject = "Japanese Yen TIBOR"
-    body = "<div>"+html_table+"</div><br/><p>Download PDF <a href='" + \
-        pdf_url+"' target='_blank'>click me!</a></p><br/>"
+    body = "<p>Download PDF <a href='" + \
+        "dd"+"' target='_blank'>click me!</a></p><br/><div>"+html_table+"</div><br/>"
 
     # attachments = ['table_image.png', 'line_chart_image.png']
     attachments = []
