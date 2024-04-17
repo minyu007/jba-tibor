@@ -74,10 +74,11 @@ try:
 
     sender_email = "chengguoyu_82@163.com"
     sender_password = "SSJTQGALEZMNHNGE"
-    recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
+    recipient_emails = ["wo_oplove@163.com", "13889632722@163.com"]
     subject = "Today's Rate"
-    body = "**Please see the attached images.**\n\n" \
-        "Below are the changes:\n\n"
+    body = "<p>Hi All, </p><br/><p>Please see the attached charts.</p><br/><p>refer to the link for more information <a href='" + \
+        base_url+"' target='_blank'>click me!</a></p><br/>"
+
     attachments = ['table_image.png', 'line_chart_image.png']
 
     change_message = calculate_change(df)
