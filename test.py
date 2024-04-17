@@ -57,7 +57,7 @@ def calculate_change(df):
     return change_message
 
 
-html_table = df.to_html()
+html_table = df.to_html(border=1)
 
 # plt.figure(figsize=(10, 6))
 # plt.table(cellText=df.values, colLabels=df.columns, rowLabels=df.index.strftime(
@@ -79,7 +79,7 @@ sender_email = "chengguoyu_82@163.com"
 sender_password = "SSJTQGALEZMNHNGE"
 recipient_emails = ["wo_oplove@163.com", "13889632722@163.com"]
 subject = "Japanese Yen TIBOR"
-body = "<p>Hi, </p><br/><p>Please see the attached charts.</p><br/><div>"+html_table+"</div><p>refer to the link for more information <a href='" + \
+body = "<p>Hi, </p><br/><div>"+html_table+"</div><p>refer to the link for more information <a href='" + \
     "https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR240417.pdf" + \
     "' target='_blank'>click me!</a></p><br/>"
 
