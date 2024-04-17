@@ -98,7 +98,7 @@ try:
     
     sender_email = "chengguoyu_82@163.com"
     sender_password = "SSJTQGALEZMNHNGE"
-    recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
+    recipient_emails = ["zling@jenseninvest.com", "13889632722@163.com"]
     subject = "Japanese Yen TIBOR"
     body = "<div>"+html_table+"</div><br/><p>Download PDF <a href='" + \
         pdf_url+"' target='_blank'>click me!</a></p><br/>"
@@ -111,7 +111,7 @@ try:
     # change_message = ""
     if len(change_list) > 0:
         change_message = f",".join(change_list) + " change more than 0.1%"
-        body += f"**<font color='red'><b>{change_message}</b></font>**"
+        body = f"**<h2><font color='red'><b>Please note: {change_message}</b></font></h2>**<br/>" + body
 
     send_email(sender_email, sender_password, ','.join(
         recipient_emails), subject, body, attachments)
