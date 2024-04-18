@@ -113,15 +113,14 @@ if not check_file_exists():
         
         sender_email = "chengguoyu_82@163.com"
         sender_password = "SSJTQGALEZMNHNGE"
-        # recipient_emails = ["zling@jenseninvest.com", "13889632722@163.com"]
-        recipient_emails = ["chengguoyu_82@163.com", "wo_oplove@163.com"]
+        recipient_emails = ["zling@jenseninvest.com", "13889632722@163.com"]
+        # recipient_emails = ["chengguoyu_82@163.com", "wo_oplove@163.com"]
         subject = "Japanese Yen TIBOR"
         body = "<p>Download PDF <a href='" + \
             "dd"+"' target='_blank'>click me!</a></p><br/><div>"+html_table+"</div><br/>"
 
         # attachments = ['table_image.png', 'line_chart_image.png']
         attachments = []
-        
         
         change_list = calculate_change(df)
         # change_message = ""
@@ -131,6 +130,7 @@ if not check_file_exists():
 
         send_email(sender_email, sender_password, ','.join(
             recipient_emails), subject, body, attachments)
+        print(df)
         save_file(pdf_url, f"{current_date}.pdf")
     except Exception as e:
         print("running into an error:", e)
