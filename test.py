@@ -98,7 +98,7 @@ try:
     
     sender_email = "chengguoyu_82@163.com"
     sender_password = "SSJTQGALEZMNHNGE"
-    recipient_emails = ["wo_oplove@163.com", "chengguoyu_82@163.com"]
+    recipient_emails = ["wo_oplove@163.com", "13889632722@163.com"]
     subject = "Japanese Yen TIBOR"
     body = "<p>Download PDF <a href='" + \
         "dd"+"' target='_blank'>click me!</a></p><br/><div>"+html_table+"</div><br/>"
