@@ -112,7 +112,7 @@ if not check_file_exists():
 
         
         sender_email = "chengguoyu_82@163.com"
-        sender_password = "SSJTQGALEZMNHNGE"
+        sender_password = "DUigKtCtMXw34MnB"
         recipient_emails = ["zling@jenseninvest.com", "13889632722@163.com"]
         # recipient_emails = ["chengguoyu_82@163.com", "wo_oplove@163.com"]
         subject = "Japanese Yen TIBOR"
