@@ -113,7 +113,7 @@ if __name__ == "__main__":
             
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
-            recipient_emails = ["chengguoyu_82@163.com"]
+            recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
             # 修复链接
