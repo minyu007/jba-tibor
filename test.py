@@ -28,9 +28,10 @@ def save_file(url, filename):
 def send_email(sender_email, sender_password, recipient_emails, subject, body, attachments=None):
     msg = MIMEMultipart()
     msg['From'] = sender_email
-    msg['To'] = ", ".join(recipient_emails)  # 邮件头部用逗号连接
+    msg['To'] = ", ".join(recipient_emails)  
     msg['Subject'] = subject
     
+    # 保留原始 CSS 样式
     css = '''
         <style>
         table{
@@ -99,52 +100,46 @@ if __name__ == "__main__":
             # 先下载文件
             save_file(pdf_url, filename)
             
-            # 解析本地 PDF - 关键修改：指定页面和区域
+            # 关键修改：让 tabula 正确识别表头（关闭 stream，改用 lattice 模式）
             tables = tabula.read_pdf(
                 filename,
-                pages="1",  # 仅解析第一页
-                area=(60, 40, 750, 580),  # 调整后的区域坐标 (top, left, bottom, right)
-                stream=True,  # 使用流模式解析连续表格
-                pandas_options={'header': None}  # 不自动识别表头
+                pages="all",          # 解析所有页（可根据实际调整）
+                lattice=True,         # 用 lattice 模式识别带边框的表格（更准识别表头）
+                pandas_options={
+                    "header": 0       # 明确指定第 0 行为表头
+                }
             )
             
+            # 处理空表格情况
             if not tables or all(table.empty for table in tables):
                 raise ValueError("未检测到PDF表格数据")
             
-            # 合并所有表格（处理多页情况）
-            dfs = [pd.DataFrame(table) for table in tables if not table.empty]
-            df = pd.concat(dfs, ignore_index=True)
+            # 合并表格（若 PDF 有多页表格）
+            df = pd.concat(tables, ignore_index=True)
             
-            # 数据清洗：处理合并单元格和空值
-            if not df.empty:
-                # 填充第一列的合并单元格（日期列）
-                df.iloc[:, 0] = df.iloc[:, 0].ffill()
-                
-                # 提取实际数据行（根据日期格式过滤）
-                date_pattern = r'\d{4}/\d{2}/\d{2}'
-                df = df[df.iloc[:, 0].str.contains(date_pattern, na=False)]
-                
-                # 设置索引
-                df.set_index(df.columns[0], inplace=True)
-                df.index.rename('date', inplace=True)
+            # 数据清洗：仅保留日期和数值行（过滤 PDF 里的无关内容）
+            date_pattern = r'^\d{4}/\d{2}/\d{2}$'  # 日期格式正则
+            df = df[df.iloc[:, 0].str.match(date_pattern, na=False)]
             
-            # 检查数据是否有效
-            if df.empty:
-                raise ValueError("解析后的数据为空")
+            # 设置索引（保持原逻辑）
+            df.set_index(df.columns[0], inplace=True)
+            df.index.rename('date', inplace=True)
             
-            # 转换为HTML表格
+            # 生成 HTML 表格（保留表头）
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
+            # 邮件相关参数
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
+            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
             recipient_emails = ["wo_oplove@163.com"]
-            # recipient_emails = ["zling@jenseninvest.com", "hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
             subject = "Japanese Yen TIBOR"
             
             # 修复链接
             body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
             
+            # 计算变化列
             change_list = calculate_change(df)
             if change_list:
                 change_message = ", ".join(change_list) + " changed by more than 0.1%"
@@ -153,7 +148,8 @@ if __name__ == "__main__":
             # 发送邮件（传递收件人列表）
             send_email(sender_email, sender_password, recipient_emails, subject, body)
             
-            print(df)  # 保持原有输出格式
+            # 打印 DataFrame（确保输出格式与预期一致）
+            print(df)
             
         except ValueError as ve:
             print("解析错误:", ve)
