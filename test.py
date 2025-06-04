@@ -102,7 +102,8 @@ if __name__ == "__main__":
             save_file(pdf_url, filename)
             
             # 解析本地 PDF
-            tables = tabula.read_pdf(filename, pages="all")
+            # tables = tabula.read_pdf(filename, pages="all")
+            tables = tabula.read_pdf(filename, pages="all", lattice=True)
             # tables = tabula.read_pdf(filename, pages="all", stream=True, multiple_tables=True)
             # tables = tabula.read_pdf(filename, pages="all", stream=True, guess=False)
             dfs = [pd.DataFrame(table) for table in tables]
