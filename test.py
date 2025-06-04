@@ -77,14 +77,16 @@ if __name__ == "__main__":
             tables = tabula.read_pdf(
                 filename,
                 pages="all",
-                lattice=True,  # 边框模式解析（适合带线表格）
+                lattice=True,  
                 pandas_options={
-                    "header": 0,  # 第 0 行作为表头
+                    "header": 0,  
                     "names": ["date", "1WEEK", "1MONTH", "2MONTH", "3MONTH", "4MONTH", 
-                               "5MONTH", "6MONTH", "7MONTH", "8MONTH", "9MONTH", 
-                               "10MONTH", "11MONTH", "12MONTH"]  # 手动指定正确表头
+                              "5MONTH", "6MONTH", "7MONTH", "8MONTH", "9MONTH", 
+                              "10MONTH", "11MONTH", "12MONTH"]  
                 },
-                area=(50, 20, 700, 550)  # 调整区域覆盖表格（可根据 PDF 微调）
+                area=(50, 20, 700, 550),
+                # 根据 PDF 实际列间隔，手动设置列分割坐标，比如 [x1, x2, x3,...] ，x 是水平方向分割点
+                columns=[50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700]  
             )
             
             # 处理空表格
