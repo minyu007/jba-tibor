@@ -6,11 +6,10 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import logging
+import os
 
 # 忽略 PDFBox 的字体警告
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
-
-import os
 
 def check_file_exists():
     current_date = datetime.now().strftime("%y%m%d")
@@ -100,23 +99,47 @@ if __name__ == "__main__":
             # 先下载文件
             save_file(pdf_url, filename)
             
-            # 解析本地 PDF **关键修改**
-            tables = tabula.read_pdf(filename, pages="all", stream=True)  # 添加stream=True提升解析准确性
-            if not tables:  # 防止tables为空导致concat失败
+            # 解析本地 PDF - 关键修改：指定页面和区域
+            tables = tabula.read_pdf(
+                filename,
+                pages="1",  # 仅解析第一页
+                area=(60, 40, 750, 580),  # 调整后的区域坐标 (top, left, bottom, right)
+                stream=True,  # 使用流模式解析连续表格
+                pandas_options={'header': None}  # 不自动识别表头
+            )
+            
+            if not tables or all(table.empty for table in tables):
                 raise ValueError("未检测到PDF表格数据")
             
-            dfs = [pd.DataFrame(table) for table in tables]
-            df = pd.concat(dfs, ignore_index=True)  # 确保dfs非空才会执行concat
+            # 合并所有表格（处理多页情况）
+            dfs = [pd.DataFrame(table) for table in tables if not table.empty]
+            df = pd.concat(dfs, ignore_index=True)
             
-            df.set_index(df.columns[0], inplace=True)
-            df.index.rename('date', inplace=True)
+            # 数据清洗：处理合并单元格和空值
+            if not df.empty:
+                # 填充第一列的合并单元格（日期列）
+                df.iloc[:, 0] = df.iloc[:, 0].ffill()
+                
+                # 提取实际数据行（根据日期格式过滤）
+                date_pattern = r'\d{4}/\d{2}/\d{2}'
+                df = df[df.iloc[:, 0].str.contains(date_pattern, na=False)]
+                
+                # 设置索引
+                df.set_index(df.columns[0], inplace=True)
+                df.index.rename('date', inplace=True)
+            
+            # 检查数据是否有效
+            if df.empty:
+                raise ValueError("解析后的数据为空")
+            
+            # 转换为HTML表格
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
             recipient_emails = ["wo_oplove@163.com"]
-            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
+            # recipient_emails = ["zling@jenseninvest.com", "hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
             subject = "Japanese Yen TIBOR"
             
             # 修复链接
@@ -130,8 +153,9 @@ if __name__ == "__main__":
             # 发送邮件（传递收件人列表）
             send_email(sender_email, sender_password, recipient_emails, subject, body)
             
-            print(df)
-        except ValueError as ve:  # 单独捕获解析失败的异常
+            print(df)  # 保持原有输出格式
+            
+        except ValueError as ve:
             print("解析错误:", ve)
         except Exception as e:
             print("运行时错误:", e)
