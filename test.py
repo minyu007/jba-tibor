@@ -95,15 +95,16 @@ if __name__ == "__main__":
         try:
             current_date = datetime.now().strftime("%y%m%d")
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
+            pdf_url=f'https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR250530.pdf'
             filename = f"{current_date}.pdf"
             
             # 先下载文件
             save_file(pdf_url, filename)
             
             # 解析本地 PDF
-            # tables = tabula.read_pdf(filename, pages="all")
+            tables = tabula.read_pdf(filename, pages="all")
             # tables = tabula.read_pdf(filename, pages="all", stream=True, multiple_tables=True)
-            tables = tabula.read_pdf(filename, pages="all", stream=True, guess=False)
+            # tables = tabula.read_pdf(filename, pages="all", stream=True, guess=False)
             dfs = [pd.DataFrame(table) for table in tables]
             df = pd.concat(dfs, ignore_index=True)
             
