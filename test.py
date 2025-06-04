@@ -1,4 +1,4 @@
-import requests
+simport requests
 import pandas as pd
 from datetime import datetime
 import tabula
@@ -102,7 +102,7 @@ if __name__ == "__main__":
             
             # 解析本地 PDF
             # tables = tabula.read_pdf(filename, pages="all")
-            tables = tabula.read_pdf(filename, pages="all", lattice=True, multiple_tables=True)
+            tables = tabula.read_pdf(filename, pages="all", stream=True, multiple_tables=True)
             
             dfs = [pd.DataFrame(table) for table in tables]
             df = pd.concat(dfs, ignore_index=True)
