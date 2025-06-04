@@ -6,6 +6,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import logging
+import numpy as np
 
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
