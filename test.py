@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 import logging
 import os
 
-# 忽略 PDFBox 的字体警告
+# 忽略 PDFBox 警告
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
 def check_file_exists():
@@ -31,41 +31,14 @@ def send_email(sender_email, sender_password, recipient_emails, subject, body, a
     msg['To'] = ", ".join(recipient_emails)  
     msg['Subject'] = subject
     
-    # 保留原始 CSS 样式
+    # 保留原始 CSS 确保表格样式
     css = '''
         <style>
-        table{
-            border-collapse: collapse;
-            width:100%;
-            border:1px solid #c6c6c6 !important;
-            margin-bottom:20px;
-        }
-        table th{
-            border-collapse: collapse;
-            border-right:1px solid #c6c6c6 !important;
-            border-bottom:1px solid #c6c6c6 !important;
-            background-color:#ddeeff !important; 
-            padding:5px 9px;
-            font-size:14px;
-            font-weight:normal;
-            text-align:center;
-        }
-        table td{
-            border-collapse: collapse;
-            border-right:1px solid #c6c6c6 !important;
-            border-bottom:1px solid #c6c6c6 !important; 
-            padding:5px 9px;
-            font-size:12px;
-            font-weight:normal;
-            text-align:center;
-            word-break: break-all;
-        }
-        table tr:nth-child(odd){
-            background-color:#fff !important; 
-        }
-        table tr:nth-child(even){
-            background-color: #f8f8f8 !important;
-        }
+        table{border-collapse: collapse;width:100%;border:1px solid #c6c6c6 !important;margin-bottom:20px;}
+        table th{border-collapse: collapse;border-right:1px solid #c6c6c6 !important;border-bottom:1px solid #c6c6c6 !important;background-color:#ddeeff !important;padding:5px 9px;font-size:14px;font-weight:normal;text-align:center;}
+        table td{border-collapse: collapse;border-right:1px solid #c6c6c6 !important;border-bottom:1px solid #c6c6c6 !important;padding:5px 9px;font-size:12px;font-weight:normal;text-align:center;word-break: break-all;}
+        table tr:nth-child(odd){background-color:#fff !important;}
+        table tr:nth-child(even){background-color: #f8f8f8 !important;}
         </style>
     '''
     msg.attach(MIMEText(css + body, 'html'))
@@ -97,46 +70,46 @@ if __name__ == "__main__":
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
-            # 先下载文件
+            # 下载 PDF
             save_file(pdf_url, filename)
             
-            # 关键修改：让 tabula 正确识别表头（关闭 stream，改用 lattice 模式）
+            # 关键修改：强制指定表头 + 修复解析区域
             tables = tabula.read_pdf(
                 filename,
-                pages="all",          # 解析所有页（可根据实际调整）
-                lattice=True,         # 用 lattice 模式识别带边框的表格（更准识别表头）
+                pages="all",
+                lattice=True,  # 边框模式解析（适合带线表格）
                 pandas_options={
-                    "header": 0       # 明确指定第 0 行为表头
-                }
+                    "header": 0,  # 第 0 行作为表头
+                    "names": ["date", "1WEEK", "1MONTH", "2MONTH", "3MONTH", "4MONTH", 
+                               "5MONTH", "6MONTH", "7MONTH", "8MONTH", "9MONTH", 
+                               "10MONTH", "11MONTH", "12MONTH"]  # 手动指定正确表头
+                },
+                area=(50, 20, 700, 550)  # 调整区域覆盖表格（可根据 PDF 微调）
             )
             
-            # 处理空表格情况
+            # 处理空表格
             if not tables or all(table.empty for table in tables):
                 raise ValueError("未检测到PDF表格数据")
             
-            # 合并表格（若 PDF 有多页表格）
+            # 合并 + 清洗：仅保留日期行
             df = pd.concat(tables, ignore_index=True)
-            
-            # 数据清洗：仅保留日期和数值行（过滤 PDF 里的无关内容）
-            date_pattern = r'^\d{4}/\d{2}/\d{2}$'  # 日期格式正则
-            df = df[df.iloc[:, 0].str.match(date_pattern, na=False)]
+            df = df[df['date'].str.match(r'^\d{4}/\d{2}/\d{2}$', na=False)]  # 过滤日期
             
             # 设置索引（保持原逻辑）
-            df.set_index(df.columns[0], inplace=True)
-            df.index.rename('date', inplace=True)
+            df.set_index('date', inplace=True)
             
-            # 生成 HTML 表格（保留表头）
+            # 生成 HTML（确保表头正确）
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
-            # 邮件相关参数
+            # 邮件参数
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
             # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
             recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
-            # 修复链接
+            # 拼接邮件内容
             body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
             
             # 计算变化列
@@ -145,10 +118,10 @@ if __name__ == "__main__":
                 change_message = ", ".join(change_list) + " changed by more than 0.1%"
                 body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
             
-            # 发送邮件（传递收件人列表）
+            # 发送邮件
             send_email(sender_email, sender_password, recipient_emails, subject, body)
             
-            # 打印 DataFrame（确保输出格式与预期一致）
+            # 打印完整 DataFrame（含正确表头）
             print(df)
             
         except ValueError as ve:
