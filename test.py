@@ -1,16 +1,14 @@
 import requests
 import pandas as pd
 from datetime import datetime
-import tabula
+import pdfplumber  # Changed from tabula to pdfplumber
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import logging
-
-# 忽略 PDFBox 的字体警告
-logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
-
 import os
+
+# No need for PDFBox font warnings with pdfplumber
 
 def check_file_exists():
     current_date = datetime.now().strftime("%y%m%d")
@@ -90,47 +88,64 @@ def calculate_change(df):
             continue
     return change_list
 
+def extract_table_from_pdf(pdf_path):
+    """Extract tables from PDF using pdfplumber"""
+    all_tables = []
+    
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            # Extract table from current page
+            table = page.extract_table()
+            if table:
+                # Convert to DataFrame and add to list
+                df_page = pd.DataFrame(table[1:], columns=table[0])
+                all_tables.append(df_page)
+    
+    if all_tables:
+        # Combine all tables into one DataFrame
+        combined_df = pd.concat(all_tables, ignore_index=True)
+        return combined_df
+    return pd.DataFrame()
+
 if __name__ == "__main__":
     if not check_file_exists():
         try:
             current_date = datetime.now().strftime("%y%m%d")
-            # pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
-            pdf_url=f'https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR250507.pdf'
+            pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
-            # 先下载文件
+            # Download file
             save_file(pdf_url, filename)
             
-            # 解析本地 PDF
-            # tables = tabula.read_pdf(filename, pages="all")
-            tables = tabula.read_pdf(filename, pages="all", lattice=True)
-            # tables = tabula.read_pdf(filename, pages="all", stream=True, multiple_tables=True)
-            # tables = tabula.read_pdf(filename, pages="all", stream=True, guess=False)
-            dfs = [pd.DataFrame(table) for table in tables]
-            df = pd.concat(dfs, ignore_index=True)
+            # Parse PDF with pdfplumber
+            df = extract_table_from_pdf(filename)
             
-            df.set_index(df.columns[0], inplace=True)
-            df.index.rename('date', inplace=True)
-            html_table = df.fillna('').to_html(border=1)
-            df.fillna(0, inplace=True)
-            
-            sender_email = "chengguoyu_82@163.com"
-            sender_password = "DUigKtCtMXw34MnB"
-            recipient_emails = ["wo_oplove@163.com"]
-            subject = "Japanese Yen TIBOR"
-            
-            # 修复链接
-            body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
-            
-            change_list = calculate_change(df)
-            if change_list:
-                change_message = ", ".join(change_list) + " changed by more than 0.1%"
-                body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
-            
-            # 发送邮件（传递收件人列表）
-            send_email(sender_email, sender_password, recipient_emails, subject, body)
-            
-            print(df)
+            if not df.empty:
+                # Set first column as index
+                df.set_index(df.columns[0], inplace=True)
+                df.index.rename('date', inplace=True)
+                html_table = df.fillna('').to_html(border=1)
+                df.fillna(0, inplace=True)
+                
+                sender_email = "chengguoyu_82@163.com"
+                sender_password = "DUigKtCtMXw34MnB"
+                # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
+                recipient_emails = ["wo_oplove@163.com"]
+                subject = "Japanese Yen TIBOR"
+                
+                body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
+                
+                change_list = calculate_change(df)
+                if change_list:
+                    change_message = ", ".join(change_list) + " changed by more than 0.1%"
+                    body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
+                
+                # Send email
+                send_email(sender_email, sender_password, recipient_emails, subject, body)
+                
+                print(df)
+            else:
+                print("未能从PDF中提取表格数据")
         except Exception as e:
             print("运行时错误:", e)
     else:
