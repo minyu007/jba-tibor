@@ -7,8 +7,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import logging
 
-# 忽略 PDFBox 的字体警告
+# 更全面的日志配置来消除所有 PDFBox 警告
+logging.getLogger("pdfminer").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.psparser").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.pdfdocument").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.pdfinterp").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.pdfpage").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.converter").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.cmapdb").setLevel(logging.ERROR)
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
+logging.getLogger("org.apache.pdfbox").setLevel(logging.ERROR)
 
 import os
 
@@ -23,13 +31,15 @@ def save_file(url, filename):
         with open(filename, 'wb') as f:
             f.write(response.content)
         print(f"文件 '{filename}' 下载成功！")
+        return True
     else:
         print(f"下载失败，状态码：{response.status_code}")
+        return False
 
 def send_email(sender_email, sender_password, recipient_emails, subject, body, attachments=None):
     msg = MIMEMultipart()
     msg['From'] = sender_email
-    msg['To'] = ", ".join(recipient_emails)  # 邮件头部用逗号连接
+    msg['To'] = ", ".join(recipient_emails)
     msg['Subject'] = subject
     
     css = '''
@@ -73,7 +83,11 @@ def send_email(sender_email, sender_password, recipient_emails, subject, body, a
     if attachments:
         for attachment in attachments:
             with open(attachment, 'rb') as file:
-                msg.attach(MIMEText(file.read(), 'plain', _charset='utf-8'))
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(file.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment)}"')
+                msg.attach(part)
 
     with smtplib.SMTP_SSL('smtp.163.com', 465) as server:
         server.login(sender_email, sender_password)
@@ -97,14 +111,33 @@ if __name__ == "__main__":
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
-            # 先下载文件
-            save_file(pdf_url, filename)
+            # 下载文件
+            if not save_file(pdf_url, filename):
+                raise Exception("Failed to download PDF file")
             
-            # 解析本地 PDF
-            tables = tabula.read_pdf(filename, pages="all")
+            # 尝试不同的提取方法
+            try:
+                # 方法1: 使用lattice模式
+                tables = tabula.read_pdf(filename, pages="all", lattice=True)
+            except:
+                try:
+                    # 方法2: 使用stream模式
+                    tables = tabula.read_pdf(filename, pages="all", stream=True)
+                except Exception as e:
+                    raise Exception(f"Failed to extract tables from PDF: {str(e)}")
             
-            dfs = [pd.DataFrame(table) for table in tables]
-            df = pd.concat(dfs, ignore_index=True)
+            if not tables:
+                raise Exception("No tables found in PDF")
+            
+            # 合并表格前检查
+            valid_tables = [table for table in tables if isinstance(table, pd.DataFrame) and not table.empty]
+            if not valid_tables:
+                raise Exception("No valid tables to concatenate")
+            
+            df = pd.concat(valid_tables, ignore_index=True)
+            
+            if df.empty:
+                raise Exception("Empty DataFrame after concatenation")
             
             df.set_index(df.columns[0], inplace=True)
             df.index.rename('date', inplace=True)
@@ -116,7 +149,6 @@ if __name__ == "__main__":
             recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
-            # 修复链接
             body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
             
             change_list = calculate_change(df)
@@ -124,11 +156,13 @@ if __name__ == "__main__":
                 change_message = ", ".join(change_list) + " changed by more than 0.1%"
                 body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
             
-            # 发送邮件（传递收件人列表）
             send_email(sender_email, sender_password, recipient_emails, subject, body)
             
+            print("Successfully processed and sent email.")
             print(df)
+            
         except Exception as e:
-            print("运行时错误:", e)
+            print("Error:", e)
+            # 可以在这里添加发送错误通知邮件的代码
     else:
         print("文件已存在，跳过程序执行。")
