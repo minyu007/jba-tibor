@@ -146,7 +146,7 @@ if __name__ == "__main__":
     if not check_file_exists():
         try:
             current_date = datetime.now().strftime("%y%m%d")
-            pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR20250626.pdf"
+            pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR250626.pdf"
             filename = f"{current_date}.pdf"
             
             save_file(pdf_url, filename)
