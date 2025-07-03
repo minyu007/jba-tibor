@@ -34,10 +34,10 @@ def create_line_chart(df):
     """Create a line chart from the DataFrame and return it as a bytes object"""
     plt.figure(figsize=(12, 6))
     
-    # Filter out empty columns
+    # Filter out empty columns - 修正括号匹配问题
     plot_columns = [col for col in df.columns 
-                   if pd.api.types.is_numeric_dtype(df[col]) 
-                   and not all(df[col].fillna(0) == 0]
+                   if (pd.api.types.is_numeric_dtype(df[col]) 
+                   and (not all(df[col].fillna(0) == 0))]
     
     # Get unique dates and their positions
     unique_dates = df.index.unique()
