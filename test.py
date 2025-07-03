@@ -9,8 +9,9 @@ from email.mime.image import MIMEImage
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import matplotlib.dates as mdates  # 添加这行导入
 import io
+import os
 
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
