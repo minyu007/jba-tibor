@@ -34,35 +34,41 @@ def create_line_chart(df):
     """Create a line chart from the DataFrame and return it as a bytes object"""
     plt.figure(figsize=(12, 6))
     
-    # Filter out empty columns - 修正括号匹配问题
-    plot_columns = [col for col in df.columns 
-                   if (pd.api.types.is_numeric_dtype(df[col]) 
-                   and (not all(df[col].fillna(0) == 0))]
+    # 正确格式化的列表推导式 - 修正括号匹配问题
+    plot_columns = [
+        col for col in df.columns 
+        if (pd.api.types.is_numeric_dtype(df[col]) and 
+            not all(df[col].fillna(0) == 0))
+    ]
     
-    # Get unique dates and their positions
+    # 如果没有有效列，返回None
+    if not plot_columns:
+        return None
+    
+    # 获取唯一日期和它们的位置
     unique_dates = df.index.unique()
     date_positions = [df.index.get_loc(date) for date in unique_dates]
     
-    # Create the plot
+    # 创建图表
     for column in plot_columns:
         plt.plot(df[column], marker='o', label=column)
     
     plt.title('Japanese Yen TIBOR Rates')
     plt.ylabel('Rate (%)')
     
-    # Set x-axis ticks only at unique date positions
+    # 设置X轴刻度只在唯一日期位置
     ax = plt.gca()
     ax.set_xticks(date_positions)
     ax.set_xticklabels([date.strftime('%Y-%m-%d') for date in unique_dates])
     
-    # Rotate date labels for better readability
+    # 旋转日期标签提高可读性
     plt.xticks(rotation=45, ha='right')
     
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
     plt.tight_layout()
     
-    # Save the plot to a bytes buffer
+    # 保存图表到字节缓冲区
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=100, bbox_inches='tight')
     buf.seek(0)
