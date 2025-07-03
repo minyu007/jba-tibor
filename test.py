@@ -33,17 +33,19 @@ def create_line_chart(df):
     """Create a line chart from the DataFrame and return it as a bytes object"""
     plt.figure(figsize=(10, 6))
     
-    # Get the index (dates) for x-axis
-    dates = df.index
+    # Filter out empty columns (columns with all NaN/zero values)
+    plot_columns = [col for col in df.columns 
+                   if df[col].dtype in ['float64', 'int64'] 
+                   and not all(df[col].fillna(0) == 0)]
     
-    # Exclude non-numeric columns
-    plot_columns = [col for col in df.columns if df[col].dtype in ['float64', 'int64']]
+    # Get dates and format them to show only day (e.g., "15" instead of "2023-10-15")
+    dates = df.index.strftime('%d')  # Format as day only
     
     for column in plot_columns:
         plt.plot(dates, df[column], marker='o', label=column)
     
     plt.title('Japanese Yen TIBOR Rates')
-    plt.xlabel('Date')
+    plt.xlabel('Day of Month')
     plt.ylabel('Rate (%)')
     plt.xticks(rotation=45)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
