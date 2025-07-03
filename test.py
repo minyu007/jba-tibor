@@ -38,16 +38,20 @@ def create_line_chart(df):
                    if df[col].dtype in ['float64', 'int64'] 
                    and not all(df[col].fillna(0) == 0)]
     
-    # Get dates and format them to show only day (e.g., "15" instead of "2023-10-15")
-    dates = df.index.strftime('%d')  # Format as day only
+    # Get dates and keep them in yyyy-mm-dd format
+    dates = df.index
     
     for column in plot_columns:
         plt.plot(dates, df[column], marker='o', label=column)
     
     plt.title('Japanese Yen TIBOR Rates')
-    plt.xlabel('Day of Month')
+    plt.xlabel('Date (yyyy-mm-dd)')
     plt.ylabel('Rate (%)')
-    plt.xticks(rotation=45)
+    
+    # Format x-axis to show dates nicely
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.gcf().autofmt_xdate()  # Auto-rotate dates for better readability
+    
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
     plt.tight_layout()
