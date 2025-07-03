@@ -28,15 +28,19 @@ def save_file(url, filename):
     else:
         print(f"下载失败，状态码：{response.status_code}")
 
+
 def create_line_chart(df):
     """Create a line chart from the DataFrame and return it as a bytes object"""
     plt.figure(figsize=(10, 6))
     
-    # Exclude the date column from plotting
-    plot_columns = [col for col in df.columns if col != 'Date']
+    # Get the index (dates) for x-axis
+    dates = df.index
+    
+    # Exclude non-numeric columns
+    plot_columns = [col for col in df.columns if df[col].dtype in ['float64', 'int64']]
     
     for column in plot_columns:
-        plt.plot(df['Date'], df[column], marker='o', label=column)
+        plt.plot(dates, df[column], marker='o', label=column)
     
     plt.title('Japanese Yen TIBOR Rates')
     plt.xlabel('Date')
@@ -221,18 +225,19 @@ if __name__ == "__main__":
             df = df.drop([0, 1])
             df = split_row_to_rows(df)
             
-            df.set_index(df.columns[0], inplace=True)
+            # Convert Date column to datetime if it's not already
+            df['Date'] = pd.to_datetime(df['Date'])
+            
+            # Set Date as index after conversion
+            df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
+            
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
-            # Reset index to make 'Date' a column again for plotting
-            df.reset_index(inplace=True)
-            
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
-            recipient_emails = ["wo_oplove@163.com"]
-            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
+            recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
             
             subject = "Japanese Yen TIBOR"
             
@@ -245,7 +250,7 @@ if __name__ == "__main__":
             
             # Create and attach chart if there are more than 4 rows
             chart_data = None
-            if len(df) >= 3:
+            if len(df) > 4:
                 chart_data = create_line_chart(df)
             
             send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
