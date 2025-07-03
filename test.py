@@ -32,26 +32,31 @@ def save_file(url, filename):
 
 def create_line_chart(df):
     """Create a line chart from the DataFrame and return it as a bytes object"""
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 6))
     
-    # Filter out empty columns (columns with all NaN/zero values)
+    # Filter out empty columns
     plot_columns = [col for col in df.columns 
-                   if df[col].dtype in ['float64', 'int64'] 
-                   and not all(df[col].fillna(0) == 0)]
+                   if pd.api.types.is_numeric_dtype(df[col]) 
+                   and not all(df[col].fillna(0) == 0]
     
-    # Get dates and keep them in yyyy-mm-dd format
-    dates = df.index
+    # Get unique dates and their positions
+    unique_dates = df.index.unique()
+    date_positions = [df.index.get_loc(date) for date in unique_dates]
     
+    # Create the plot
     for column in plot_columns:
-        plt.plot(dates, df[column], marker='o', label=column)
+        plt.plot(df[column], marker='o', label=column)
     
     plt.title('Japanese Yen TIBOR Rates')
-    plt.xlabel('Date (yyyy-mm-dd)')
     plt.ylabel('Rate (%)')
     
-    # Format x-axis to show dates nicely
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    plt.gcf().autofmt_xdate()  # Auto-rotate dates for better readability
+    # Set x-axis ticks only at unique date positions
+    ax = plt.gca()
+    ax.set_xticks(date_positions)
+    ax.set_xticklabels([date.strftime('%Y-%m-%d') for date in unique_dates])
+    
+    # Rotate date labels for better readability
+    plt.xticks(rotation=45, ha='right')
     
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
@@ -59,7 +64,7 @@ def create_line_chart(df):
     
     # Save the plot to a bytes buffer
     buf = io.BytesIO()
-    plt.savefig(buf, format='png', dpi=100)
+    plt.savefig(buf, format='png', dpi=100, bbox_inches='tight')
     buf.seek(0)
     plt.close()
     
