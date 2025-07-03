@@ -5,12 +5,14 @@ import tabula
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 import logging
 import numpy as np
+import matplotlib.pyplot as plt
+import os
+import io
 
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
-
-import os
 
 def check_file_exists():
     current_date = datetime.now().strftime("%y%m%d")
@@ -26,7 +28,33 @@ def save_file(url, filename):
     else:
         print(f"下载失败，状态码：{response.status_code}")
 
-def send_email(sender_email, sender_password, recipient_emails, subject, body, attachments=None):
+def create_line_chart(df):
+    """Create a line chart from the DataFrame and return it as a bytes object"""
+    plt.figure(figsize=(10, 6))
+    
+    # Exclude the date column from plotting
+    plot_columns = [col for col in df.columns if col != 'Date']
+    
+    for column in plot_columns:
+        plt.plot(df['Date'], df[column], marker='o', label=column)
+    
+    plt.title('Japanese Yen TIBOR Rates')
+    plt.xlabel('Date')
+    plt.ylabel('Rate (%)')
+    plt.xticks(rotation=45)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.grid(True)
+    plt.tight_layout()
+    
+    # Save the plot to a bytes buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=100)
+    buf.seek(0)
+    plt.close()
+    
+    return buf
+
+def send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data=None, attachments=None):
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = ", ".join(recipient_emails)
@@ -68,8 +96,20 @@ def send_email(sender_email, sender_password, recipient_emails, subject, body, a
         }
         </style>
     '''
+    
+    # Add chart if provided
+    if chart_data:
+        chart_html = '<h3>TIBOR Rates Trend</h3><img src="cid:chart">'
+        body = chart_html + body
+    
     msg.attach(MIMEText(css + body, 'html'))
-
+    
+    # Attach chart image
+    if chart_data:
+        image = MIMEImage(chart_data.read())
+        image.add_header('Content-ID', '<chart>')
+        msg.attach(image)
+    
     if attachments:
         for attachment in attachments:
             with open(attachment, 'rb') as file:
@@ -145,8 +185,7 @@ def split_row_to_rows(df):
 if __name__ == "__main__":
     if not check_file_exists():
         try:
-            # current_date = datetime.now().strftime("%y%m%d")
-            current_date = '250626'
+            current_date = datetime.now().strftime("%y%m%d")
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
@@ -187,6 +226,9 @@ if __name__ == "__main__":
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
+            # Reset index to make 'Date' a column again for plotting
+            df.reset_index(inplace=True)
+            
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
             recipient_emails = ["wo_oplove@163.com"]
@@ -201,12 +243,15 @@ if __name__ == "__main__":
                 change_message = ", ".join(change_list) + " changed by more than 0.1%"
                 body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
             
-            send_email(sender_email, sender_password, recipient_emails, subject, body)
+            # Create and attach chart if there are more than 4 rows
+            chart_data = None
+            if len(df) >= 3:
+                chart_data = create_line_chart(df)
+            
+            send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
             
             print(df)
         except Exception as e:
             print("运行时错误:", e)
     else:
         print("文件已存在，跳过程序执行。")
-
-
