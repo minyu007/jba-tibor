@@ -34,11 +34,11 @@ def create_line_chart(df):
     """Create a line chart from the DataFrame and return it as a bytes object"""
     plt.figure(figsize=(12, 6))
     
-    # Filter out empty columns
+    # 完全修正括号问题的列表推导式
     plot_columns = [
         col for col in df.columns 
         if (pd.api.types.is_numeric_dtype(df[col]) and 
-           (not all(df[col].fillna(0) == 0))
+            not all(df[col].fillna(0) == 0))
     ]
     
     # 如果没有有效列，返回None
@@ -47,7 +47,11 @@ def create_line_chart(df):
     
     # 确保索引是datetime类型
     if not isinstance(df.index, pd.DatetimeIndex):
-        df.index = pd.to_datetime(df.index)
+        try:
+            df.index = pd.to_datetime(df.index)
+        except Exception as e:
+            print(f"日期转换错误: {e}")
+            return None
     
     # 创建图表 - 直接使用日期作为x值
     for column in plot_columns:
