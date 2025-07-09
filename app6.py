@@ -303,7 +303,7 @@ if __name__ == "__main__":
             
             # Create and attach chart if there are more than 4 rows
             chart_data = None
-            if len(df) >= 3:
+            if len(df) >= 5:
                 chart_data = create_line_chart(df)
             
             send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
