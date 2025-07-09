@@ -53,11 +53,29 @@ def create_line_chart(df):
             print(f"日期转换错误: {e}")
             return None
     
+    # 计算变化点
+    change_points = {}
+    for column in plot_columns:
+        if len(df) >= 2:  # 至少需要两个点才能计算变化
+            changes = df[column].diff().abs() > 0.001  # 变化超过0.1%
+            change_points[column] = df.index[changes][1:]  # 第一个点是NaN，跳过
+    
     # 创建图表 - 直接使用日期作为x值
     for column in plot_columns:
-        plt.plot(df.index, df[column], marker='o', label=column)
+        line = plt.plot(df.index, df[column], marker='o', label=column)
+        
+        # 标注变化点
+        if column in change_points and not change_points[column].empty:
+            for date in change_points[column]:
+                y_val = df.loc[date, column]
+                plt.annotate(f'{y_val:.4f}%', 
+                             xy=(date, y_val),
+                             xytext=(10, 10), 
+                             textcoords='offset points',
+                             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+                             arrowprops=dict(arrowstyle='->'))
     
-    plt.title('Japanese Yen TIBOR Rates')
+    plt.title('Japanese Yen TIBOR Rates (Changes Highlighted)')
     plt.ylabel('Rate (%)')
     plt.xlabel('Date')
     
