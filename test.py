@@ -55,9 +55,35 @@ def create_line_chart(df):
     
     # 创建图表 - 直接使用日期作为x值
     for column in plot_columns:
-        plt.plot(df.index, df[column], marker='o', label=column)
+        line = plt.plot(df.index, df[column], marker='o', label=column)
+        
+        # 计算变化百分比并标注
+        if len(df) >= 2:  # 至少需要两个点才能计算变化
+            changes = df[column].diff()
+            for i in range(1, len(df)):  # 从第二个点开始检查
+                change = changes.iloc[i]
+                if abs(change) > 0.001:  # 变化超过0.1%
+                    date = df.index[i]
+                    y_val = df[column].iloc[i]
+                    prev_val = df[column].iloc[i-1]
+                    change_pct = (change / prev_val) * 100  # 计算变化百分比
+                    
+                    # 确定箭头方向
+                    arrow_direction = '↑' if change > 0 else '↓'
+                    
+                    plt.annotate(f'{arrow_direction}{abs(change_pct):.2f}%', 
+                                xy=(date, y_val),
+                                xytext=(0, 15 if change > 0 else -15),  # 向上或向下偏移
+                                textcoords='offset points',
+                                ha='center',
+                                va='center',
+                                bbox=dict(boxstyle='round,pad=0.5', 
+                                         fc='yellow' if change > 0 else 'lightgreen', 
+                                         alpha=0.8),
+                                arrowprops=dict(arrowstyle='->', 
+                                               color='red' if change > 0 else 'blue'))
     
-    plt.title('Japanese Yen TIBOR Rates')
+    plt.title('Japanese Yen TIBOR Rates with Changes Highlighted')
     plt.ylabel('Rate (%)')
     plt.xlabel('Date')
     
