@@ -31,107 +31,116 @@ def save_file(url, filename):
 
 
 def create_line_chart(df):
-    """Create a line chart from the DataFrame with enhanced visibility for small rate changes"""
-    plt.figure(figsize=(12, 8))
+    """Create a line chart with better separation between lines"""
+    plt.figure(figsize=(14, 8))
     
     # 获取有效列
     plot_columns = [
         col for col in df.columns 
         if (pd.api.types.is_numeric_dtype(df[col]) and 
-            not all(df[col].fillna(0) == 0))
+           not all(df[col].fillna(0) == 0)
     ]
     
     if not plot_columns:
         return None
     
     # 确保索引是datetime类型
-    if not isinstance(df.index, pd.DatetimeIndex):
-        try:
-            df.index = pd.to_datetime(df.index)
-        except Exception as e:
-            print(f"日期转换错误: {e}")
-            return None
+    try:
+        df.index = pd.to_datetime(df.index)
+    except Exception as e:
+        print(f"日期转换错误: {e}")
+        return None
     
-    # 计算Y轴范围 - 放大变化区间
+    # 创建图表 - 使用不同的线型和标记增强区分度
+    line_styles = ['-', '--', '-.', ':']
+    markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'h']
+    colors = plt.cm.tab10.colors  # 使用标准颜色循环
+    
+    ax = plt.gca()
+    
+    # 计算合适的y轴范围
     min_rate = df[plot_columns].min().min()
     max_rate = df[plot_columns].max().max()
-    range_rate = max_rate - min_rate
+    rate_range = max_rate - min_rate
     
-    # 如果变动范围小于0.5%，则放大显示区间
-    if range_rate < 0.5:
-        y_padding = max(0.1, range_rate * 2)  # 至少0.1%的padding
-        plt.ylim(min_rate - y_padding, max_rate + y_padding)
+    # 如果数据范围太小，放大显示区域
+    y_padding = max(0.1, rate_range * 0.5)  # 至少0.1%的padding
+    plt.ylim(min_rate - y_padding, max_rate + y_padding)
     
-    # 创建主图表
-    ax1 = plt.gca()
-    
-    # 绘制每条线并标注变化值
-    for column in plot_columns:
-        line, = ax1.plot(df.index, df[column], marker='o', label=column, linewidth=2)
+    # 绘制每条线
+    for i, column in enumerate(plot_columns):
+        # 循环使用不同的线型、标记和颜色
+        line_style = line_styles[i % len(line_styles)]
+        marker = markers[i % len(markers)]
+        color = colors[i % len(colors)]
         
-        # 标注每个数据点的值
-        for x, y in zip(df.index, df[column]):
-            ax1.annotate(f"{y:.4f}%", 
-                        (x, y),
-                        textcoords="offset points",
-                        xytext=(0,10),
-                        ha='center',
-                        fontsize=8)
+        line = ax.plot(
+            df.index, 
+            df[column], 
+            label=column,
+            linestyle=line_style,
+            marker=marker,
+            color=color,
+            linewidth=2,
+            markersize=8,
+            markeredgecolor='white',
+            markeredgewidth=1
+        )
         
-        # 计算并标注变化百分比
-        if len(df[column]) > 1:
-            changes = df[column].diff().dropna()
-            for i, (date, change) in enumerate(zip(df.index[1:], changes)):
-                color = 'red' if change > 0 else 'green' if change < 0 else 'gray'
-                ax1.annotate(f"{change:+.4f}%", 
-                            (date, df[column].iloc[i+1]),
-                            textcoords="offset points",
-                            xytext=(0,-15),
-                            ha='center',
-                            color=color,
-                            fontsize=8,
-                            bbox=dict(boxstyle='round,pad=0.2', 
-                                    fc='white', 
-                                    alpha=0.7))
+        # 添加数据标签（可选）
+        if len(df) <= 7:  # 数据点不多时才显示标签
+            for x, y in zip(df.index, df[column]):
+                ax.annotate(
+                    f"{y:.4f}%",
+                    (x, y),
+                    textcoords="offset points",
+                    xytext=(0, 10),
+                    ha='center',
+                    fontsize=9,
+                    bbox=dict(
+                        boxstyle='round,pad=0.2',
+                        fc='white',
+                        alpha=0.7
+                    )
+                )
     
-    # 添加基准线(昨日收盘价)
-    if len(df) > 1:
-        for column in plot_columns:
-            ax1.axhline(y=df[column].iloc[1], 
-                       color='gray', 
-                       linestyle='--', 
-                       alpha=0.3,
-                       linewidth=0.5)
+    # 图表美化
+    ax.set_title('Japanese Yen TIBOR Rates (Enhanced Visibility)', fontsize=14, pad=20)
+    ax.set_ylabel('Rate (%)', fontsize=12)
+    ax.set_xlabel('Date', fontsize=12)
     
-    ax1.set_title('Japanese Yen TIBOR Rates (Enhanced View)', fontsize=14, pad=20)
-    ax1.set_ylabel('Rate (%)', fontsize=12)
-    ax1.set_xlabel('Date', fontsize=12)
-    
-    # 格式化日期轴
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    ax1.xaxis.set_major_locator(mdates.AutoDateLocator())
+    # 日期格式设置
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     plt.xticks(rotation=45, ha='right')
     
-    # 添加网格线
-    ax1.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    # 网格和背景
+    ax.grid(True, linestyle='--', alpha=0.6)
+    ax.set_axisbelow(True)
     
-    # 添加图例
-    ax1.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10)
+    # 图例位置调整
+    ax.legend(
+        bbox_to_anchor=(1.05, 1),
+        loc='upper left',
+        frameon=True,
+        framealpha=1,
+        edgecolor='#333',
+        title='Tenor',
+        title_fontsize=12
+    )
     
-    # 添加第二Y轴显示变化绝对值
-    ax2 = ax1.twinx()
-    ax2.set_ylim(ax1.get_ylim())
-    ax2.set_ylabel('Change (bps)', fontsize=12)
-    # 将百分比转换为基点(bps)
-    y_ticks = ax1.get_yticks()
-    ax2.set_yticks(y_ticks)
-    ax2.set_yticklabels([f"{int((y-y_ticks[0])*10000)/100}" for y in y_ticks])
-    
+    # 调整布局
     plt.tight_layout()
     
-    # 保存图表到字节缓冲区
+    # 保存图表
     buf = io.BytesIO()
-    plt.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+    plt.savefig(
+        buf, 
+        format='png', 
+        dpi=150, 
+        bbox_inches='tight',
+        facecolor='white'
+    )
     buf.seek(0)
     plt.close()
     
