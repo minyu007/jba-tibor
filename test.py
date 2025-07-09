@@ -34,18 +34,17 @@ def create_line_chart(df):
     """Create a line chart from the DataFrame and return it as a bytes object"""
     plt.figure(figsize=(12, 6))
     
-    # 完全修正括号问题的列表推导式
+    # 筛选需要绘制的列
     plot_columns = [
         col for col in df.columns 
         if (pd.api.types.is_numeric_dtype(df[col]) and 
             not all(df[col].fillna(0) == 0))
     ]
     
-    # 如果没有有效列，返回None
     if not plot_columns:
         return None
     
-    # 确保索引是datetime类型
+    # 确保索引是datetime类型并按日期升序排列
     if not isinstance(df.index, pd.DatetimeIndex):
         try:
             df.index = pd.to_datetime(df.index)
@@ -53,13 +52,16 @@ def create_line_chart(df):
             print(f"日期转换错误: {e}")
             return None
     
-    # 创建图表 - 直接使用日期作为x值
+    # 确保数据按日期升序排列（从左到右时间递增）
+    df = df.sort_index()
+    
+    # 创建图表
     for column in plot_columns:
         line = plt.plot(df.index, df[column], marker='o', label=column)
         
-        # 计算变化百分比并标注
+        # 计算变化并标注（从左到右）
         if len(df) >= 2:  # 至少需要两个点才能计算变化
-            changes = df[column].diff()
+            changes = df[column].diff()  # 计算与前一个点的差值
             for i in range(1, len(df)):  # 从第二个点开始检查
                 change = changes.iloc[i]
                 if abs(change) > 0.001:  # 变化超过0.1%
@@ -68,38 +70,40 @@ def create_line_chart(df):
                     prev_val = df[column].iloc[i-1]
                     change_pct = (change / prev_val) * 100  # 计算变化百分比
                     
-                    # 确定箭头方向
+                    # 确定箭头方向和颜色
                     arrow_direction = '↑' if change > 0 else '↓'
+                    arrow_color = 'red' if change > 0 else 'blue'
+                    bg_color = 'lightcoral' if change > 0 else 'lightblue'
                     
+                    # 添加标注
                     plt.annotate(f'{arrow_direction}{abs(change_pct):.2f}%', 
                                 xy=(date, y_val),
-                                xytext=(0, 15 if change > 0 else -15),  # 向上或向下偏移
+                                xytext=(0, 15 if change > 0 else -15),
                                 textcoords='offset points',
                                 ha='center',
                                 va='center',
                                 bbox=dict(boxstyle='round,pad=0.5', 
-                                         fc='yellow' if change > 0 else 'lightgreen', 
+                                         fc=bg_color, 
                                          alpha=0.8),
                                 arrowprops=dict(arrowstyle='->', 
-                                               color='red' if change > 0 else 'blue'))
+                                               color=arrow_color,
+                                               linewidth=1.5))
     
-    plt.title('Japanese Yen TIBOR Rates with Changes Highlighted')
+    plt.title('Japanese Yen TIBOR Rates with Daily Changes')
     plt.ylabel('Rate (%)')
     plt.xlabel('Date')
     
-    # 自动格式化日期刻度
+    # 格式化x轴
     ax = plt.gca()
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-    
-    # 旋转日期标签提高可读性
     plt.xticks(rotation=45, ha='right')
     
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True)
     plt.tight_layout()
     
-    # 保存图表到字节缓冲区
+    # 保存图表
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=100, bbox_inches='tight')
     buf.seek(0)
