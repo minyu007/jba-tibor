@@ -262,6 +262,7 @@ if __name__ == "__main__":
             
             df = pd.concat(dfs, ignore_index=True)
             print(df.columns)
+            print(df)
             df.columns=['Date',
                 '1WEEK',
                 '1MONTH',
