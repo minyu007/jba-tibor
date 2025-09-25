@@ -197,11 +197,16 @@ def split_row_to_rows(df):
     
     # 首先处理分割数据
     for col in first_row.index:
-        if first_row[col] == '':
-            split_data[col] = ['']
+        # 关键修改：确保值是字符串类型
+        cell_value = first_row[col]
+        
+        # 如果是数字，直接作为一个元素放入列表，无需分割
+        # 这是更稳健的做法
+        if pd.api.types.is_numeric_dtype(type(cell_value)):
+            split_data[col] = [cell_value]
         else:
-            # 分割字符串并去除空白字符
-            split_values = [v.strip() for v in first_row[col].split('\r')]
+            # 确保是字符串再进行 split
+            split_values = [v.strip() for v in str(cell_value).split('\r')]
             split_data[col] = split_values
     
     max_length = max(len(v) for v in split_data.values())
