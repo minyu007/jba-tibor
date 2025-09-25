@@ -188,59 +188,54 @@ def calculate_change(df):
     return change_list
 
 def split_row_to_rows(df):
+    """
+    遍历DataFrame的每一行，将包含换行符(\r)的单元格拆分成多行。
+    """
     if df.empty:
         return pd.DataFrame()
     
-    first_row = df.iloc[0].copy()
-    first_row = first_row.replace({np.nan: ''})
-    split_data = {}
+    # 用于存储所有拆分后行的列表
+    all_split_rows = []
     
-    # 首先处理分割数据
-    for col in first_row.index:
-        # 关键修改：确保值是字符串类型
-        cell_value = first_row[col]
+    # 遍历原始DataFrame的每一行
+    for index, row in df.iterrows():
+        row = row.replace({np.nan: ''})
+        split_data = {}
         
-        # 如果是数字，直接作为一个元素放入列表，无需分割
-        # 这是更稳健的做法
-        if pd.api.types.is_numeric_dtype(type(cell_value)):
-            split_data[col] = [cell_value]
-        else:
-            # 确保是字符串再进行 split
-            split_values = [v.strip() for v in str(cell_value).split('\r')]
-            split_data[col] = split_values
-    
-    max_length = max(len(v) for v in split_data.values())
-    
-    # 统一长度并转换数字
-    for col in split_data:
-        current_length = len(split_data[col])
-        if current_length < max_length:
-            split_data[col].extend([''] * (max_length - current_length))
-        
-        # 尝试将非空字符串转换为float
-        converted_values = []
-        for val in split_data[col]:
-            if val == '':
-                converted_values.append(np.nan)
+        # 处理当前行的每一列
+        for col in row.index:
+            cell_value = row[col]
+            
+            if pd.api.types.is_numeric_dtype(type(cell_value)):
+                split_data[col] = [cell_value]
             else:
-                try:
-                    # 移除可能存在的百分号或其他非数字字符
-                    cleaned_val = val.replace('%', '').strip()
-                    converted_values.append(float(cleaned_val))
-                except (ValueError, AttributeError):
-                    # 如果转换失败，保留原始值（通常是日期列）
-                    converted_values.append(val)
-        split_data[col] = converted_values
+                # 确保是字符串再进行 split
+                split_values = [v.strip() for v in str(cell_value).split('\r')]
+                split_data[col] = split_values
+        
+        max_length = max(len(v) for v in split_data.values())
+        
+        # 统一长度
+        for col in split_data:
+            current_length = len(split_data[col])
+            if current_length < max_length:
+                # 使用np.nan填充，而不是空字符串，方便后续处理
+                split_data[col].extend([np.nan] * (max_length - current_length))
+        
+        # 将当前行拆分后的结果转换为DataFrame并添加到列表中
+        split_df = pd.DataFrame(split_data)
+        all_split_rows.append(split_df)
     
-    new_df = pd.DataFrame(split_data)
+    # 将所有拆分后的DataFrame合并成一个
+    if not all_split_rows:
+        return pd.DataFrame()
+        
+    new_df = pd.concat(all_split_rows, ignore_index=True)
     
-    # 确保所有数值列都是float类型
+    # 尝试将所有非'Date'列转换为数值类型
     for col in new_df.columns:
-        if col != 'Date' and new_df[col].dtype == 'object':
-            try:
-                new_df[col] = pd.to_numeric(new_df[col], errors='ignore')
-            except:
-                pass
+        if col != 'Date':
+            new_df[col] = pd.to_numeric(new_df[col], errors='coerce')
     
     return new_df
 
