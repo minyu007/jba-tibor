@@ -274,7 +274,7 @@ if __name__ == "__main__":
                 '9MONTH',
                 '10MONTH',
                 '11MONTH',
-                '12MONTH']
+                '12MONTH', 'test']
             df = df.drop([0, 1])
             df = split_row_to_rows(df)
             
