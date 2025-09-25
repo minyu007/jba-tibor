@@ -280,8 +280,14 @@ if __name__ == "__main__":
                 '11MONTH',
                 '12MONTH'
                ]
+
+            print(df.columns)
+            print(df)
             df = df.drop([0, 1])
             df = split_row_to_rows(df)
+
+            print(df.columns)
+            print(df)
             
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
