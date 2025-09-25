@@ -258,8 +258,8 @@ if __name__ == "__main__":
             dfs = [pd.DataFrame(table) for table in tables]
             
             df = pd.concat(dfs, ignore_index=True)
-            print(df.columns)
-            print(df)
+            # print(df.columns)
+            # print(df)
             df.columns=['Date',
                 '1WEEK',
                 '1MONTH',
@@ -276,13 +276,13 @@ if __name__ == "__main__":
                 '12MONTH'
                ]
 
-            print(df.columns)
-            print(df)
+            # print(df.columns)
+            # print(df)
             df = df.drop([0, 1])
             df = split_row_to_rows(df)
 
-            print(df.columns)
-            print(df)
+            # print(df.columns)
+            # print(df)
             
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
