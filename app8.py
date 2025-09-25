@@ -248,6 +248,7 @@ if __name__ == "__main__":
     if not check_file_exists():
         try:
             current_date = datetime.now().strftime("%y%m%d")
+            current_date='250924'
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
@@ -262,8 +263,8 @@ if __name__ == "__main__":
             dfs = [pd.DataFrame(table) for table in tables]
             
             df = pd.concat(dfs, ignore_index=True)
-            # print(df.columns)
-            # print(df)
+            print(df.columns)
+            print(df)
             df.columns=['Date',
                 '1WEEK',
                 '1MONTH',
