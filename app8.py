@@ -278,7 +278,7 @@ if __name__ == "__main__":
 
             # print(df.columns)
             # print(df)
-            df = df.drop([0, 1])
+            # df = df.drop([0, 1])
             df = split_row_to_rows(df)
 
             # print(df.columns)
