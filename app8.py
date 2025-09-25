@@ -243,7 +243,7 @@ if __name__ == "__main__":
     if not check_file_exists():
         try:
             current_date = datetime.now().strftime("%y%m%d")
-            current_date='250924'
+            # current_date='250924'
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
@@ -296,8 +296,8 @@ if __name__ == "__main__":
             
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
-            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
-            recipient_emails = ["wo_oplove@163.com"]
+            recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
+            # recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
             body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
