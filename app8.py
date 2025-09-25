@@ -261,6 +261,7 @@ if __name__ == "__main__":
             dfs = [pd.DataFrame(table) for table in tables]
             
             df = pd.concat(dfs, ignore_index=True)
+            print(df.columns)
             df.columns=['Date',
                 '1WEEK',
                 '1MONTH',
@@ -273,7 +274,8 @@ if __name__ == "__main__":
                 '8MONTH',
                 '9MONTH',
                 '10MONTH',
-                '11MONTH'
+                '11MONTH',
+                '12MONTH'
                ]
             df = df.drop([0, 1])
             df = split_row_to_rows(df)
