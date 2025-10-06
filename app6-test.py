@@ -17,7 +17,7 @@ logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
 
 # current_date = datetime.now().strftime("%y%m%d")
-current_date = '251002'
+current_date = '251001'
 
 def check_file_exists():
     # current_date = datetime.now().strftime("%y%m%d")
