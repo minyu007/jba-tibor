@@ -254,22 +254,35 @@ if __name__ == "__main__":
                 pages="all",
                 multiple_tables=False,
                 lattice=True, 
-                guess=True
+                guess=False
             )
+
+            tables2 = tabula.read_pdf(
+                filename,
+                pages="all",
+                multiple_tables=False,
+                steam=True, 
+                guess=False
+            )
+
+            # date_array_by_position = df.iloc[:, 0].values
                         
             dfs = [pd.DataFrame(table) for table in tables]
-            print("读取的表格数量:", len(dfs))
-            for i, df in enumerate(dfs):
-                print(f"表格 {i} 的形状: {df.shape}")
-                print(f"表格 {i} 的内容:")
-                print(df)
-                print("---")
+            dfs2 = [pd.DataFrame(table2) for table2 in tables2]
 
-            print(dfs)
+            print(dfs2)
+            # print("读取的表格数量:", len(dfs))
+            # for i, df in enumerate(dfs):
+            #     print(f"表格 {i} 的形状: {df.shape}")
+            #     print(f"表格 {i} 的内容:")
+            #     print(df)
+            #     print("---")
+
+            # print(dfs)
             
             df = pd.concat(dfs, ignore_index=True)
 
-            print(df)
+            # print(df)
             
             df.columns=['Date',
                 '1WEEK',
