@@ -270,7 +270,7 @@ if __name__ == "__main__":
             dfs2 = [pd.DataFrame(table2) for table2 in tables2]
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
-                print(df2)
+                print(df2.columns)
                 date_array_by_position = df2.iloc[:, 0].values
 
             date_list = [s.split()[0] for s in date_array_by_position]
