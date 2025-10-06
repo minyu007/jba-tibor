@@ -17,7 +17,7 @@ logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
 
 # current_date = datetime.now().strftime("%y%m%d")
-current_date = '250924'
+current_date = '251001'
 
 def check_file_exists():
     # current_date = datetime.now().strftime("%y%m%d")
@@ -330,7 +330,7 @@ if __name__ == "__main__":
             
             send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
             
-            print(df)
+            # print(df)
         except Exception as e:
             print("运行时错误:", e)
     else:
