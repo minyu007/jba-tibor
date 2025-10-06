@@ -16,8 +16,8 @@ import os
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
 
-current_date = datetime.now().strftime("%y%m%d")
-# current_date = '250930'
+# current_date = datetime.now().strftime("%y%m%d")
+current_date = '250930'
 
 def check_file_exists():
     # current_date = datetime.now().strftime("%y%m%d")
@@ -306,19 +306,19 @@ if __name__ == "__main__":
             df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
 
-            excel_path = './jba-tibor/all_data.xlsx'
-            
-            # 检查Excel文件是否存在
-            if os.path.exists(excel_path):
-                df_new = df.reset_index()
-                df_temp = pd.read_excel(excel_path)
-                df_temp['date'] = pd.to_datetime(df_temp['date'])
-                combined_df = pd.concat([df_temp, df_new], ignore_index=True)
-                combined_df.drop_duplicates(subset=['date'], keep='last', inplace=True)
-                combined_df.sort_values('date', ascending=False, inplace=True)
-                df = combined_df.set_index('date')
-                print("数据已与历史记录合并、去重并排序。")
+            excel_path = './all_data.xlsx'
             df.to_excel(excel_path)
+            # # 检查Excel文件是否存在
+            # if os.path.exists(excel_path):
+            #     df_new = df.reset_index()
+            #     df_temp = pd.read_excel(excel_path)
+            #     df_temp['date'] = pd.to_datetime(df_temp['date'])
+            #     combined_df = pd.concat([df_temp, df_new], ignore_index=True)
+            #     combined_df.drop_duplicates(subset=['date'], keep='last', inplace=True)
+            #     combined_df.sort_values('date', ascending=False, inplace=True)
+            #     df = combined_df.set_index('date')
+            #     print("数据已与历史记录合并、去重并排序。")
+            # df.to_excel(excel_path)
 
             
             df = df.head(30)
