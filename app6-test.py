@@ -254,8 +254,7 @@ if __name__ == "__main__":
                 pages="all",
                 multiple_tables=False,
                 lattice=True, 
-                guess=True,
-                pandas_options={'header': 4}
+                guess=True
             )
                         
             dfs = [pd.DataFrame(table) for table in tables]
