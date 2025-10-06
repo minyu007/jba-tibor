@@ -281,8 +281,8 @@ if __name__ == "__main__":
                 date_array_by_position = df2.iloc[:, 0].values
                 print("---")
 
-            
-            print(date_array_by_position)
+            date_list = [s.split()[0] for s in date_array_by_position]
+            print(date_list)
             
             df = pd.concat(dfs, ignore_index=True)
 
