@@ -251,8 +251,10 @@ if __name__ == "__main__":
             
             tables = tabula.read_pdf(
                 filename,
-                pages="all"
-             
+                pages="1",          # 目标PDF仅1页
+                lattice=True,       # 适配表格边框（目标PDF有明确边框）
+                area=[80, 20, 200, 700],  # 表格在PDF中的坐标（实测适配该文件）
+                pandas_options={"header": None}  # 不自动识别表头（后续手动处理）
             )
             
             dfs = [pd.DataFrame(table) for table in tables]
