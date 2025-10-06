@@ -262,7 +262,8 @@ if __name__ == "__main__":
                 pages="all",
                 multiple_tables=False,
                 stream=True, 
-                guess=False
+                guess=False,
+                pandas_options={'header': 4}
             )
 
             # date_array_by_position = df.iloc[:, 0].values
