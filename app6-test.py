@@ -306,9 +306,22 @@ if __name__ == "__main__":
             df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
 
-            df_temp = pd.read_excel('./all_data.xlsx')
-            #这里将df与df_temp进行合并赋值给df，并且去掉df中有重复的date的行
-            # 然后将合并后的df.to_excel('./all_data.xlsx')
+            excel_path = './all_data.xlsx'
+            
+            # 检查Excel文件是否存在
+            if os.path.exists(excel_path):
+                df_new = df.reset_index()
+                df_temp = pd.read_excel(excel_path)
+                df_temp['date'] = pd.to_datetime(df_temp['date'])
+                combined_df = pd.concat([df_temp, df_new], ignore_index=True)
+                combined_df.drop_duplicates(subset=['date'], keep='last', inplace=True)
+                combined_df.sort_values('date', inplace=True)
+                df = combined_df.set_index('date')
+                print("数据已与历史记录合并、去重并排序。")
+            df.to_excel(excel_path)
+
+            print(df)
+            
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
