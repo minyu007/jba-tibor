@@ -334,4 +334,4 @@ if __name__ == "__main__":
         except Exception as e:
             print("运行时错误:", e)
     else:
-        print("文件已存在，跳过程序执行。")
+        print(f"{current_date}.pdf 已存在，跳过程序执行。")
