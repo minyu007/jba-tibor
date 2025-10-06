@@ -252,8 +252,9 @@ if __name__ == "__main__":
             tables = tabula.read_pdf(
                 filename,
                 pages="all",
-                lattice=True,
-                pandas_options={'header': None}
+                lattice=True,  # 保留网格识别
+                pandas_options={'header': None},  # 不自动读表头
+                columns=[80, 118, 156, 194, 232, 270, 308, 346, 384, 422, 460, 498, 536, 574]  # 14列的分割位置
             )
             
             dfs = [pd.DataFrame(table) for table in tables]
