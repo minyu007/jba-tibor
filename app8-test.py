@@ -277,11 +277,10 @@ if __name__ == "__main__":
             if len(tables) == 0:
                 print("无法从PDF中提取表格数据")
                 # 创建空的DataFrame
-                # df = pd.DataFrame()
-                return
+                df = pd.DataFrame()
+                
             
             dfs = [pd.DataFrame(table) for table in tables]
-            # print()
             
             df = pd.concat(dfs, ignore_index=True)
             print(df.columns)
