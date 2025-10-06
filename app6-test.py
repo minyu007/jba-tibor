@@ -278,8 +278,10 @@ if __name__ == "__main__":
             
             
             df = pd.concat(dfs, ignore_index=True)
+            df2 = pd.concat(dfs2, ignore_index=True)
 
             print(df)
+            print(df2)
             
             df.columns=[
                 '1WEEK',
