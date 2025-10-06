@@ -251,11 +251,20 @@ if __name__ == "__main__":
             
             tables = tabula.read_pdf(
                 filename,
-                pages="1",          # 目标PDF仅1页
-                lattice=True,       # 适配表格边框（目标PDF有明确边框）
-                area=[80, 20, 200, 700],  # 表格在PDF中的坐标（实测适配该文件）
-                pandas_options={"header": None}  # 不自动识别表头（后续手动处理）
+                pages="all",
+                stream=True  # 先使用stream模式
             )
+            
+            if len(tables) == 0:
+                print("使用stream模式未提取到表格，尝试使用lattice模式...")
+                tables = tabula.read_pdf(
+                    filename,
+                    pages="all",
+                    lattice=True  # 再使用lattice模式
+                )
+            
+            if len(tables) == 0:
+                raise Exception("无法从PDF中提取表格，请检查PDF格式。")
             
             dfs = [pd.DataFrame(table) for table in tables]
             
