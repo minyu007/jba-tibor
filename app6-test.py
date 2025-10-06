@@ -252,7 +252,7 @@ if __name__ == "__main__":
             tables = tabula.read_pdf(
                 filename,
                 pages="all",
-                multiple_tables=True,
+                multiple_tables=False,
                 lattice=True, 
                 guess=False,
                 pandas_options={'header': 0}
