@@ -192,12 +192,12 @@ def calculate_change(df):
     return change_list
 
 def split_row_to_rows(df):
-    print(len(df))
     if df.empty:
         return pd.DataFrame()
     
     first_row = df.iloc[0].copy()
     first_row = first_row.replace({np.nan: ''})
+    first_row = first_row.astype(str)  # 所有值转为字符串，确保后续可调用split()
     split_data = {}
 
     print(first_row.index)
