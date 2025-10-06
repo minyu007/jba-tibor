@@ -302,6 +302,7 @@ if __name__ == "__main__":
                 '10MONTH',
                 '11MONTH',
                 '12MONTH']
+            df['Date'] = date_list
             df = df.drop([0, 1])
             df = split_row_to_rows(df)
             
