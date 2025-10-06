@@ -347,7 +347,7 @@ if __name__ == "__main__":
             recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
-            body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
+            body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><p>If you would like to see all the data, please check the Excel file in the attachment. </p><br/><div>{html_table}</div><br/>"
             
             change_list = calculate_change(df)
             if change_list:
