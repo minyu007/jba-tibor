@@ -272,6 +272,9 @@ if __name__ == "__main__":
 
             dfs = [pd.DataFrame(table) for table in tables]
             dfs2 = [pd.DataFrame(table2) for table2 in tables2]
+
+            print(dfs)
+            print(dfs2)
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
                 date_array_by_position = df2.iloc[:, 0].values
