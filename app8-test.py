@@ -250,8 +250,7 @@ if __name__ == "__main__":
             save_file(pdf_url, filename)
             
             tables = tabula.read_pdf(
-                filename,
-                pages="all"
+                filename
              
             )
             
