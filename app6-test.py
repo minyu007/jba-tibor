@@ -268,10 +268,9 @@ if __name__ == "__main__":
 
             dfs = [pd.DataFrame(table) for table in tables]
             dfs2 = [pd.DataFrame(table2) for table2 in tables2]
-            print(dfs)
-            print(dfs2)
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
+                print(df2)
                 date_array_by_position = df2.iloc[:, 0].values
 
             date_list = [s.split()[0] for s in date_array_by_position]
@@ -280,8 +279,6 @@ if __name__ == "__main__":
             df = pd.concat(dfs, ignore_index=True)
             df2 = pd.concat(dfs2, ignore_index=True)
 
-            print(df)
-            print(df2)
             
             df.columns=[
                 '1WEEK',
