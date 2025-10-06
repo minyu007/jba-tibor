@@ -251,7 +251,7 @@ if __name__ == "__main__":
             
             tables = tabula.read_pdf(
                 filename
-             
+                pages="all"
             )
             
             dfs = [pd.DataFrame(table) for table in tables]
