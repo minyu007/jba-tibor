@@ -15,8 +15,12 @@ import os
 
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
+
+current_date = datetime.now().strftime("%y%m%d")
+# current_date = '250930'
+
 def check_file_exists():
-    current_date = datetime.now().strftime("%y%m%d")
+    # current_date = datetime.now().strftime("%y%m%d")
     filename = f"{current_date}.pdf"
     return os.path.exists(filename)
 
@@ -193,14 +197,16 @@ def split_row_to_rows(df):
     
     first_row = df.iloc[0].copy()
     first_row = first_row.replace({np.nan: ''})
+    first_row = first_row.astype(str)  # 所有值转为字符串，确保后续可调用split()
     split_data = {}
-    
+
     # 首先处理分割数据
     for col in first_row.index:
         if first_row[col] == '':
             split_data[col] = ['']
         else:
             # 分割字符串并去除空白字符
+            print(first_row[col])
             split_values = [v.strip() for v in first_row[col].split('\r')]
             split_data[col] = split_values
     
@@ -242,8 +248,6 @@ def split_row_to_rows(df):
 if __name__ == "__main__":
     if not check_file_exists():
         try:
-            current_date = datetime.now().strftime("%y%m%d")
-            # current_date = '251002'
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
@@ -268,17 +272,15 @@ if __name__ == "__main__":
 
             dfs = [pd.DataFrame(table) for table in tables]
             dfs2 = [pd.DataFrame(table2) for table2 in tables2]
+
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
                 date_array_by_position = df2.iloc[:, 0].values
-
+            print(date_array_by_position)
             date_list = [s.split()[0] for s in date_array_by_position]
             
             
             df = pd.concat(dfs, ignore_index=True)
-            
-            df2 = pd.concat(dfs2, ignore_index=True)
-
             
             df.columns=[
                 '1WEEK',
@@ -294,20 +296,33 @@ if __name__ == "__main__":
                 '10MONTH',
                 '11MONTH',
                 '12MONTH']
-      
-
-            # df = df.drop([0, 1])
             df = split_row_to_rows(df)
             df.insert(0, 'Date', date_list)
 
-            print(df)
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
             
             # Set Date as index after conversion
             df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
+
+            excel_path = './all_data.xlsx'
             
+            # 检查Excel文件是否存在
+            if os.path.exists(excel_path):
+                df_new = df.reset_index()
+                df_temp = pd.read_excel(excel_path)
+                df_temp['date'] = pd.to_datetime(df_temp['date'])
+                combined_df = pd.concat([df_temp, df_new], ignore_index=True)
+                combined_df.drop_duplicates(subset=['date'], keep='last', inplace=True)
+                combined_df.sort_values('date', ascending=False, inplace=True)
+                df = combined_df.set_index('date')
+                print("数据已与历史记录合并、去重并排序。")
+            df.to_excel(excel_path)
+
+            
+            df = df.head(30)
+            print(df)
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
@@ -326,13 +341,12 @@ if __name__ == "__main__":
             
             # Create and attach chart if there are more than 4 rows
             chart_data = None
-            if len(df) >= 5:
-                chart_data = create_line_chart(df)
+            # if len(df) >= 5:
+            chart_data = create_line_chart(df)
             
             send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
             
-            print(df)
         except Exception as e:
             print("运行时错误:", e)
     else:
-        print("文件已存在，跳过程序执行。")
+        print(f"{current_date}.pdf 已存在，跳过程序执行。")
