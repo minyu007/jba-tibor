@@ -198,9 +198,12 @@ def split_row_to_rows(df):
     first_row = df.iloc[0].copy()
     first_row = first_row.replace({np.nan: ''})
     split_data = {}
-    
+
+    print(first_row.index)
     # 首先处理分割数据
     for col in first_row.index:
+        print(col)
+        print(first_row[col])
         if first_row[col] == '':
             split_data[col] = ['']
         else:
