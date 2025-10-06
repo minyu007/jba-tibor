@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
             # print(df)
             
-            df.columns=['Date',
+            df.columns=[
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
