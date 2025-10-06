@@ -302,7 +302,7 @@ if __name__ == "__main__":
                 '10MONTH',
                 '11MONTH',
                 '12MONTH']
-      
+            print(df)
             df = split_row_to_rows(df)
             df.insert(0, 'Date', date_list)
 
