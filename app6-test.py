@@ -253,8 +253,8 @@ if __name__ == "__main__":
                 filename,
                 pages="all",
                 multiple_tables=False,
-                stream=True, 
-                guess=False,
+                lattice=True, 
+                guess=True,
                 pandas_options={'header': 4}
             )
                         
