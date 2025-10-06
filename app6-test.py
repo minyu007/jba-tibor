@@ -315,7 +315,7 @@ if __name__ == "__main__":
                 df_temp['date'] = pd.to_datetime(df_temp['date'])
                 combined_df = pd.concat([df_temp, df_new], ignore_index=True)
                 combined_df.drop_duplicates(subset=['date'], keep='last', inplace=True)
-                combined_df.sort_values('date', inplace=True)
+                combined_df.sort_values('date', ascending=False, inplace=True)
                 df = combined_df.set_index('date')
                 print("数据已与历史记录合并、去重并排序。")
             df.to_excel(excel_path)
