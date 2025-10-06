@@ -17,7 +17,7 @@ logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
 
 current_date = datetime.now().strftime("%y%m%d")
-# current_date = '251001'
+# current_date = '250930'
 
 def check_file_exists():
     # current_date = datetime.now().strftime("%y%m%d")
@@ -305,6 +305,8 @@ if __name__ == "__main__":
             # Set Date as index after conversion
             df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
+
+            df.to_excel('./all_data.xlsx')
             
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
