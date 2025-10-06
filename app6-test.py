@@ -249,24 +249,16 @@ if __name__ == "__main__":
             
             save_file(pdf_url, filename)
             
-            # tables = tabula.read_pdf(
-            #     filename,
-            #     pages="all",
-            #     multiple_tables=True,
-            #     lattice=True, 
-            #     stream=True, 
-            #     guess=False,
-            #     pandas_options={'header': None}
-            # )
             tables = tabula.read_pdf(
                 filename,
                 pages="all",
                 multiple_tables=True,
                 lattice=True, 
                 stream=True, 
-                guess=False
+                guess=False,
+                pandas_options={'header': None}
             )
-            
+                        
             dfs = [pd.DataFrame(table) for table in tables]
 
             print(dfs)
