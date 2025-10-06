@@ -68,7 +68,7 @@ def create_line_chart(df):
             changes = df[column].diff()  # 计算与前一个点的差值
             for i in range(1, len(df)):  # 从第二个点开始检查
                 change = changes.iloc[i]
-                if abs(change) > 0.001:  # 变化超过0.1%
+                if abs(change) > 0.0001:  # 变化超过0.1%
                     date = df.index[i]
                     y_val = df[column].iloc[i]
                     prev_val = df[column].iloc[i-1]
