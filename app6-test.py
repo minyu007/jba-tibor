@@ -206,7 +206,7 @@ def split_row_to_rows(df):
             split_data[col] = ['']
         else:
             # 分割字符串并去除空白字符
-            print(first_row[col])
+            # print(first_row[col])
             split_values = [v.strip() for v in first_row[col].split('\r')]
             split_data[col] = split_values
     
