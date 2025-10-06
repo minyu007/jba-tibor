@@ -249,86 +249,72 @@ if __name__ == "__main__":
             
             save_file(pdf_url, filename)
             
-            # -------------------------- 关键：自动识别表格，后续清理多余列 --------------------------
-            # 移除columns参数，避免过度拆分；lattice=True确保识别网格
             tables = tabula.read_pdf(
                 filename,
-                pages="all",
-                lattice=True,
-                pandas_options={'header': None}  # 不自动读表头（PDF表头在表格外）
+                pages="all"
+             
             )
             
-            if not tables:
-                print("未提取到表格！")
-            else:
-                df = pd.concat(tables, ignore_index=True)
-                print(f"初始读取列数：{len(df.columns)}")  # 可能输出26
-                
-                # -------------------------- 核心：清理多余列，保留14列有效数据 --------------------------
-                # 1. 删除全空列（PDF中隐藏的空白列）
-                df = df.dropna(how='all', axis=1)
-                # 2. 按数据类型筛选：保留“含日期的列”+“13个数值列”（共14列）
-                # - 第1列：含日期（2025/10/02等），作为Date列
-                # - 后续列：筛选数值列（利率为小数，如0.49636），保留前13个
-                date_col_idx = 0  # 第1列是日期列
-                numeric_cols = []
-                for col_idx in range(1, len(df.columns)):
-                    # 尝试转换为数值，非空值占比>50%则视为有效利率列
-                    col_data = pd.to_numeric(df.iloc[:, col_idx], errors='coerce')
-                    if col_data.notna().sum() / len(col_data) > 0.5:
-                        numeric_cols.append(col_idx)
-                    # 只保留13个数值列（对应1WEEK~12MONTH）
-                    if len(numeric_cols) == 13:
-                        break
-                # 3. 组装最终14列数据（Date列+13个利率列）
-                keep_cols = [date_col_idx] + numeric_cols[:13]
-                df = df.iloc[:, keep_cols].reset_index(drop=True)
-                print(f"清理后列数：{len(df.columns)}")  # 应输出14，匹配列名数量
-                
-                # -------------------------- 赋值正确列名（14个，含12MONTH） --------------------------
-                df.columns = ['Date', '1WEEK', '1MONTH', '2MONTH', '3MONTH', '4MONTH', 
-                              '5MONTH', '6MONTH', '7MONTH', '8MONTH', '9MONTH', 
-                              '10MONTH', '11MONTH', '12MONTH']
-    
-                # print(df.columns)
-                # print(df)
-                # df = df.drop([0, 1])
-                df = split_row_to_rows(df)
-    
-                # print(df.columns)
-                # print(df)
-                
-                # Convert Date column to datetime if it's not already
-                df['Date'] = pd.to_datetime(df['Date'])
-                
-                # Set Date as index after conversion
-                df.set_index('Date', inplace=True)
-                df.index.rename('date', inplace=True)
-                
-                html_table = df.fillna('').to_html(border=1)
-                df.fillna(0, inplace=True)
-                
-                sender_email = "chengguoyu_82@163.com"
-                sender_password = "DUigKtCtMXw34MnB"
-                # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
-                recipient_emails = ["wo_oplove@163.com"]
-                subject = "Japanese Yen TIBOR"
-                
-                body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
-                
-                change_list = calculate_change(df)
-                if change_list:
-                    change_message = ", ".join(change_list) + " changed by more than 0.1%"
-                    body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
-                
-                # Create and attach chart if there are more than 4 rows
-                chart_data = None
-                if len(df) >= 5:
-                    chart_data = create_line_chart(df)
-                
-                send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
-                
-                print(df)
+            dfs = [pd.DataFrame(table) for table in tables]
+            
+            df = pd.concat(dfs, ignore_index=True)
+            # print(df.columns)
+            # print(df)
+            df.columns=['Date',
+                '1WEEK',
+                '1MONTH',
+                '2MONTH',
+                '3MONTH',
+                '4MONTH',
+                '5MONTH',
+                '6MONTH',
+                '7MONTH',
+                '8MONTH',
+                '9MONTH',
+                '10MONTH',
+                '11MONTH',
+                '12MONTH'
+               ]
+
+            # print(df.columns)
+            # print(df)
+            # df = df.drop([0, 1])
+            df = split_row_to_rows(df)
+
+            # print(df.columns)
+            # print(df)
+            
+            # Convert Date column to datetime if it's not already
+            df['Date'] = pd.to_datetime(df['Date'])
+            
+            # Set Date as index after conversion
+            df.set_index('Date', inplace=True)
+            df.index.rename('date', inplace=True)
+            
+            html_table = df.fillna('').to_html(border=1)
+            df.fillna(0, inplace=True)
+            
+            sender_email = "chengguoyu_82@163.com"
+            sender_password = "DUigKtCtMXw34MnB"
+            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
+            recipient_emails = ["wo_oplove@163.com"]
+            subject = "Japanese Yen TIBOR"
+            
+            body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
+            
+            change_list = calculate_change(df)
+            if change_list:
+                change_message = ", ".join(change_list) + " changed by more than 0.1%"
+                body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
+            
+            # Create and attach chart if there are more than 4 rows
+            chart_data = None
+            if len(df) >= 5:
+                chart_data = create_line_chart(df)
+            
+            send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
+            
+            print(df)
         except Exception as e:
             print("运行时错误:", e)
     else:
