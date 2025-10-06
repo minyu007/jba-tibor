@@ -275,7 +275,7 @@ if __name__ == "__main__":
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
                 date_array_by_position = df2.iloc[:, 0].values
-            
+            print(date_array_by_position)
             date_list = [s.split()[0] for s in date_array_by_position]
             
             
