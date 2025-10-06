@@ -276,7 +276,6 @@ if __name__ == "__main__":
             
             
             df = pd.concat(dfs, ignore_index=True)
-            print(df) 
             
             df2 = pd.concat(dfs2, ignore_index=True)
 
@@ -299,6 +298,8 @@ if __name__ == "__main__":
 
             # df = df.drop([0, 1])
             df = split_row_to_rows(df)
+            df.insert(0, 'Date', data_list)
+
             print(df)
             # # Convert Date column to datetime if it's not already
             # df['Date'] = pd.to_datetime(df['Date'])
