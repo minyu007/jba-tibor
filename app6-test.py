@@ -192,6 +192,7 @@ def calculate_change(df):
     return change_list
 
 def split_row_to_rows(df):
+    print(len(df))
     if df.empty:
         return pd.DataFrame()
     
