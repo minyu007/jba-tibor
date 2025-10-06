@@ -256,7 +256,8 @@ if __name__ == "__main__":
             )
             
             dfs = [pd.DataFrame(table) for table in tables]
-            
+            print(dfs)
+            # print(df)
             df = pd.concat(dfs, ignore_index=True)
             print(df.columns)
             print(df)
