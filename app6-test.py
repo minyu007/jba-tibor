@@ -253,7 +253,7 @@ if __name__ == "__main__":
                 filename,
                 pages="all",
                 multiple_tables=False,
-                lattice=True, 
+                steam=True, 
                 guess=False,
                 pandas_options={'header': 0}
             )
