@@ -68,7 +68,7 @@ def create_line_chart(df):
             changes = df[column].diff()  # 计算与前一个点的差值
             for i in range(1, len(df)):  # 从第二个点开始检查
                 change = changes.iloc[i]
-                if abs(change) > 0.001:  # 变化超过0.1%
+                if abs(change) > 0.00001:  # 变化超过0.1% 0.001
                     date = df.index[i]
                     y_val = df[column].iloc[i]
                     prev_val = df[column].iloc[i-1]
@@ -307,7 +307,7 @@ if __name__ == "__main__":
             df.index.rename('date', inplace=True)
 
             excel_path = './all_data.xlsx'
-            # df.to_excel(excel_path)
+            
             # 检查Excel文件是否存在
             if os.path.exists(excel_path):
                 df_new = df.reset_index()
@@ -328,8 +328,8 @@ if __name__ == "__main__":
             
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
-            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
-            recipient_emails = ["wo_oplove@163.com"]
+            recipient_emails = ["13889632722@163.com", "chengguoyu_82@163.com"]
+            # recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
             body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
