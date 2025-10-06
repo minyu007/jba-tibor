@@ -306,8 +306,9 @@ if __name__ == "__main__":
             df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
 
-            df.to_excel('./all_data.xlsx')
-            
+            df_temp = pd.read_excel('./all_data.xlsx')
+            #这里将df与df_temp进行合并赋值给df，并且去掉df中有重复的date的行
+            # 然后将合并后的df.to_excel('./all_data.xlsx')
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
@@ -326,8 +327,8 @@ if __name__ == "__main__":
             
             # Create and attach chart if there are more than 4 rows
             chart_data = None
-            if len(df) >= 5:
-                chart_data = create_line_chart(df)
+            # if len(df) >= 5:
+            chart_data = create_line_chart(df)
             
             send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
             
