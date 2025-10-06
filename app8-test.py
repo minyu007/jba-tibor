@@ -252,19 +252,10 @@ if __name__ == "__main__":
             tables = tabula.read_pdf(
                 filename,
                 pages="all",
-                stream=True  # 先使用stream模式
+                stream=True,
+                guess=False,
+                pandas_options={'header': 0}  # 使用第一行作为列名
             )
-            
-            if len(tables) == 0:
-                print("使用stream模式未提取到表格，尝试使用lattice模式...")
-                tables = tabula.read_pdf(
-                    filename,
-                    pages="all",
-                    lattice=True  # 再使用lattice模式
-                )
-            
-            if len(tables) == 0:
-                raise Exception("无法从PDF中提取表格，请检查PDF格式。")
             
             dfs = [pd.DataFrame(table) for table in tables]
             
