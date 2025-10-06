@@ -16,8 +16,8 @@ import os
 logging.getLogger("org.apache.fontbox").setLevel(logging.ERROR)
 
 
-# current_date = datetime.now().strftime("%y%m%d")
-current_date = '251001'
+current_date = datetime.now().strftime("%y%m%d")
+# current_date = '251001'
 
 def check_file_exists():
     # current_date = datetime.now().strftime("%y%m%d")
@@ -200,11 +200,8 @@ def split_row_to_rows(df):
     first_row = first_row.astype(str)  # 所有值转为字符串，确保后续可调用split()
     split_data = {}
 
-    print(first_row.index)
     # 首先处理分割数据
     for col in first_row.index:
-        print(col)
-        print(first_row[col])
         if first_row[col] == '':
             split_data[col] = ['']
         else:
@@ -251,8 +248,6 @@ def split_row_to_rows(df):
 if __name__ == "__main__":
     if not check_file_exists():
         try:
-            # current_date = datetime.now().strftime("%y%m%d")
-            # current_date = '250924'
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
@@ -278,8 +273,6 @@ if __name__ == "__main__":
             dfs = [pd.DataFrame(table) for table in tables]
             dfs2 = [pd.DataFrame(table2) for table2 in tables2]
 
-            print(dfs)
-            print(dfs2)
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
                 date_array_by_position = df2.iloc[:, 0].values
@@ -288,7 +281,6 @@ if __name__ == "__main__":
             
             
             df = pd.concat(dfs, ignore_index=True)
-            print(date_list)
             
             df.columns=[
                 '1WEEK',
@@ -304,11 +296,9 @@ if __name__ == "__main__":
                 '10MONTH',
                 '11MONTH',
                 '12MONTH']
-            print(df)
             df = split_row_to_rows(df)
             df.insert(0, 'Date', date_list)
 
-            print(df)
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
             
@@ -339,7 +329,6 @@ if __name__ == "__main__":
             
             send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
             
-            # print(df)
         except Exception as e:
             print("运行时错误:", e)
     else:
