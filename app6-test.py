@@ -298,7 +298,7 @@ if __name__ == "__main__":
 
             # df = df.drop([0, 1])
             df = split_row_to_rows(df)
-            df.insert(0, 'Date', data_list)
+            df.insert(0, 'Date', date_list)
 
             print(df)
             # # Convert Date column to datetime if it's not already
