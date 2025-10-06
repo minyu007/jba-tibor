@@ -271,14 +271,11 @@ if __name__ == "__main__":
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
                 date_array_by_position = df2.iloc[:, 0].values
-
+            
             date_list = [s.split()[0] for s in date_array_by_position]
             
             
             df = pd.concat(dfs, ignore_index=True)
-            
-            df2 = pd.concat(dfs2, ignore_index=True)
-
             
             df.columns=[
                 '1WEEK',
@@ -295,8 +292,6 @@ if __name__ == "__main__":
                 '11MONTH',
                 '12MONTH']
       
-
-            # df = df.drop([0, 1])
             df = split_row_to_rows(df)
             df.insert(0, 'Date', date_list)
 
