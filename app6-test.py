@@ -301,37 +301,37 @@ if __name__ == "__main__":
             df.insert(0, 'Date', date_list)
 
             print(df)
-            # # Convert Date column to datetime if it's not already
-            # df['Date'] = pd.to_datetime(df['Date'])
+            # Convert Date column to datetime if it's not already
+            df['Date'] = pd.to_datetime(df['Date'])
             
-            # # Set Date as index after conversion
-            # df.set_index('Date', inplace=True)
-            # df.index.rename('date', inplace=True)
+            # Set Date as index after conversion
+            df.set_index('Date', inplace=True)
+            df.index.rename('date', inplace=True)
             
-            # html_table = df.fillna('').to_html(border=1)
-            # df.fillna(0, inplace=True)
+            html_table = df.fillna('').to_html(border=1)
+            df.fillna(0, inplace=True)
             
-            # sender_email = "chengguoyu_82@163.com"
-            # sender_password = "DUigKtCtMXw34MnB"
-            # # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
-            # recipient_emails = ["wo_oplove@163.com"]
-            # subject = "Japanese Yen TIBOR"
+            sender_email = "chengguoyu_82@163.com"
+            sender_password = "DUigKtCtMXw34MnB"
+            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com"]
+            recipient_emails = ["wo_oplove@163.com"]
+            subject = "Japanese Yen TIBOR"
             
-            # body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
+            body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
             
-            # change_list = calculate_change(df)
-            # if change_list:
-            #     change_message = ", ".join(change_list) + " changed by more than 0.1%"
-            #     body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
+            change_list = calculate_change(df)
+            if change_list:
+                change_message = ", ".join(change_list) + " changed by more than 0.1%"
+                body = f"**<h3><font color='red'><b>Please note that {change_message}</b></font></h3>**<br/>" + body
             
-            # # Create and attach chart if there are more than 4 rows
-            # chart_data = None
-            # if len(df) >= 5:
-            #     chart_data = create_line_chart(df)
+            # Create and attach chart if there are more than 4 rows
+            chart_data = None
+            if len(df) >= 5:
+                chart_data = create_line_chart(df)
             
-            # send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
+            send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
             
-            # print(df)
+            print(df)
         except Exception as e:
             print("运行时错误:", e)
     else:
