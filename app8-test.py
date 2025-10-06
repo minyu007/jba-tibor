@@ -239,29 +239,6 @@ def split_row_to_rows(df):
     
     return new_df
 
-
-def extract_tables_from_pdf(filename):
-    """尝试多种方法提取PDF表格"""
-    methods = [
-        {"pages": "all", "stream": True},  # 流模式
-        {"pages": "all", "lattice": True},  # 网格模式
-        {"pages": "all"},  # 默认方法
-    ]
-    
-    for i, params in enumerate(methods):
-        try:
-            method_name = list(params.keys())[0] if len(params) == 1 else "default"
-            print(f"尝试方法 {i+1}: {method_name}模式...")
-            tables = tabula.read_pdf(filename, **params)
-            if len(tables) > 0:
-                print(f"方法 {i+1} 成功提取到 {len(tables)} 个表格")
-                return tables
-        except Exception as e:
-            print(f"方法 {i+1} 失败: {e}")
-            continue
-    
-    return []
-    
 if __name__ == "__main__":
     if not check_file_exists():
         try:
@@ -272,19 +249,17 @@ if __name__ == "__main__":
             
             save_file(pdf_url, filename)
             
-            tables = extract_tables_from_pdf(filename)
-            
-            if len(tables) == 0:
-                print("无法从PDF中提取表格数据")
-                # 创建空的DataFrame
-                df = pd.DataFrame()
-                
+            tables = tabula.read_pdf(
+                filename,
+                pages="all"
+             
+            )
             
             dfs = [pd.DataFrame(table) for table in tables]
             
             df = pd.concat(dfs, ignore_index=True)
-            print(df.columns)
-            print(df)
+            # print(df.columns)
+            # print(df)
             df.columns=['Date',
                 '1WEEK',
                 '1MONTH',
