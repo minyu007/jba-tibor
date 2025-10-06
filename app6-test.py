@@ -283,7 +283,7 @@ if __name__ == "__main__":
             
             
             df = pd.concat(dfs, ignore_index=True)
-            print(df)
+            print(date_list)
             
             df.columns=[
                 '1WEEK',
