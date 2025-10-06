@@ -306,7 +306,7 @@ if __name__ == "__main__":
             df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
 
-            excel_path = '~/jba-tibor/all_data.xlsx'
+            excel_path = './jba-tibor/all_data.xlsx'
             
             # 检查Excel文件是否存在
             if os.path.exists(excel_path):
