@@ -272,14 +272,17 @@ if __name__ == "__main__":
             dfs2 = [pd.DataFrame(table2) for table2 in tables2]
 
             print(dfs2)
+            date_array_by_position = []
             print("读取的表格数量:", len(dfs2))
             for i, df2 in enumerate(dfs2):
                 print(f"表格 {i} 的形状: {df2.shape}")
                 print(f"表格 {i} 的内容:")
                 print(df2)
+                date_array_by_position = df2.iloc[:, 0].values
                 print("---")
 
-            # print(dfs)
+            
+            print(date_array_by_position)
             
             df = pd.concat(dfs, ignore_index=True)
 
