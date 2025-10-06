@@ -260,6 +260,12 @@ if __name__ == "__main__":
             )
                         
             dfs = [pd.DataFrame(table) for table in tables]
+            print("读取的表格数量:", len(dfs))
+            for i, df in enumerate(dfs):
+                print(f"表格 {i} 的形状: {df.shape}")
+                print(f"表格 {i} 的内容:")
+                print(df)
+                print("---")
 
             print(dfs)
             
