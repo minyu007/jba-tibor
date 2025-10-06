@@ -271,6 +271,9 @@ if __name__ == "__main__":
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
                 print(df2.columns)
+                for col in df2.columns:  # df.columns 会返回所有列名的列表
+                    print(f"\n=== 列名：{col} 的所有值 ===")
+                    print(df[col].values) 
                 date_array_by_position = df2.iloc[:, 0].values
 
             date_list = [s.split()[0] for s in date_array_by_position]
