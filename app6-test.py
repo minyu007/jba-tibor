@@ -320,8 +320,9 @@ if __name__ == "__main__":
                 print("数据已与历史记录合并、去重并排序。")
             df.to_excel(excel_path)
 
-            print(df)
             
+            df = df.head(30)
+            print(df)
             html_table = df.fillna('').to_html(border=1)
             df.fillna(0, inplace=True)
             
