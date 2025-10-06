@@ -243,6 +243,7 @@ if __name__ == "__main__":
     if not check_file_exists():
         try:
             current_date = datetime.now().strftime("%y%m%d")
+            # current_date = '251002'
             pdf_url = f"https://www.jbatibor.or.jp/rate/pdf/JAPANESEYENTIBOR{current_date}.pdf"
             filename = f"{current_date}.pdf"
             
@@ -250,18 +251,36 @@ if __name__ == "__main__":
             
             tables = tabula.read_pdf(
                 filename,
-                pages="all"
-                multiple_tables=True,
+                pages="all",
+                multiple_tables=False,
                 lattice=True, 
+                guess=False
+            )
+
+            tables2 = tabula.read_pdf(
+                filename,
+                pages="all",
+                multiple_tables=False,
                 stream=True, 
                 guess=False,
-                pandas_options={'header': None}
+                pandas_options={'header': 4}
             )
-            
+
             dfs = [pd.DataFrame(table) for table in tables]
+            dfs2 = [pd.DataFrame(table2) for table2 in tables2]
+            date_array_by_position = []
+            for i, df2 in enumerate(dfs2):
+                date_array_by_position = df2.iloc[:, 0].values
+
+            date_list = [s.split()[0] for s in date_array_by_position]
+            
             
             df = pd.concat(dfs, ignore_index=True)
-            df.columns=['Date',
+            
+            df2 = pd.concat(dfs2, ignore_index=True)
+
+            
+            df.columns=[
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
@@ -275,9 +294,13 @@ if __name__ == "__main__":
                 '10MONTH',
                 '11MONTH',
                 '12MONTH']
-            df = df.drop([0, 1])
+      
+
+            # df = df.drop([0, 1])
             df = split_row_to_rows(df)
-            
+            df.insert(0, 'Date', date_list)
+
+            print(df)
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
             
