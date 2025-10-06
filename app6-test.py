@@ -6,10 +6,14 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+# -------------------------- 步骤1：新增导入 --------------------------
+from email.mime.base import MIMEBase
+from email import encoders
+# ---------------------------------------------------------------------
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates  # 添加这行导入
+import matplotlib.dates as mdates
 import io
 import os
 
@@ -20,7 +24,6 @@ current_date = datetime.now().strftime("%y%m%d")
 # current_date = '250930'
 
 def check_file_exists():
-    # current_date = datetime.now().strftime("%y%m%d")
     filename = f"{current_date}.pdf"
     return os.path.exists(filename)
 
@@ -171,10 +174,25 @@ def send_email(sender_email, sender_password, recipient_emails, subject, body, c
         image.add_header('Content-ID', '<chart>')
         msg.attach(image)
     
+    # -------------------------- 步骤2：修正附件处理逻辑 --------------------------
     if attachments:
         for attachment in attachments:
             with open(attachment, 'rb') as file:
-                msg.attach(MIMEText(file.read(), 'plain', _charset='utf-8'))
+                # 创建二进制附件对象
+                mime_attachment = MIMEBase('application', 'octet-stream')
+                # 设置附件内容
+                mime_attachment.set_payload(file.read())
+                # Base64编码
+                encoders.encode_base64(mime_attachment)
+                # 设置附件文件名（仅显示文件名，不含路径）
+                filename = os.path.basename(attachment)
+                mime_attachment.add_header(
+                    'Content-Disposition',
+                    f'attachment; filename="{filename}"'
+                )
+                # 添加附件到邮件
+                msg.attach(mime_attachment)
+    # -----------------------------------------------------------------------------
 
     with smtplib.SMTP_SSL('smtp.163.com', 465) as server:
         server.login(sender_email, sender_password)
@@ -206,7 +224,6 @@ def split_row_to_rows(df):
             split_data[col] = ['']
         else:
             # 分割字符串并去除空白字符
-            # print(first_row[col])
             split_values = [v.strip() for v in first_row[col].split('\r')]
             split_data[col] = split_values
     
@@ -279,7 +296,6 @@ if __name__ == "__main__":
             print(date_array_by_position)
             date_list = [s.split()[0] for s in date_array_by_position]
             
-            
             df = pd.concat(dfs, ignore_index=True)
             
             df.columns=[
@@ -306,9 +322,9 @@ if __name__ == "__main__":
             df.set_index('Date', inplace=True)
             df.index.rename('date', inplace=True)
 
-            excel_path = './all_data.xlsx'
+            excel_path = './all_data.xlsx'  # 要发送的Excel文件路径
             
-            # 检查Excel文件是否存在
+            # 检查Excel文件是否存在并合并数据
             if os.path.exists(excel_path):
                 df_new = df.reset_index()
                 df_temp = pd.read_excel(excel_path)
@@ -318,8 +334,7 @@ if __name__ == "__main__":
                 combined_df.sort_values('date', ascending=False, inplace=True)
                 df = combined_df.set_index('date')
                 print("数据已与历史记录合并、去重并排序。")
-            df.to_excel(excel_path)
-
+            df.to_excel(excel_path)  # 保存Excel文件
             
             df = df.head(30)
             print(df)
@@ -328,8 +343,8 @@ if __name__ == "__main__":
             
             sender_email = "chengguoyu_82@163.com"
             sender_password = "DUigKtCtMXw34MnB"
-            recipient_emails = ["13889632722@163.com", "chengguoyu_82@163.com"]
-            # recipient_emails = ["wo_oplove@163.com"]
+            # recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com", "chengguoyu_82@163.com"]
+            recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
             body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><div>{html_table}</div><br/>"
@@ -341,10 +356,20 @@ if __name__ == "__main__":
             
             # Create and attach chart if there are more than 4 rows
             chart_data = None
-            # if len(df) >= 5:
             chart_data = create_line_chart(df)
             
-            send_email(sender_email, sender_password, recipient_emails, subject, body, chart_data)
+            # -------------------------- 步骤3：传入Excel附件路径 --------------------------
+            send_email(
+                sender_email, 
+                sender_password, 
+                recipient_emails, 
+                subject, 
+                body, 
+                chart_data, 
+                attachments=[excel_path]  # 把Excel文件作为附件传入
+            )
+            # -----------------------------------------------------------------------------
+            print("邮件发送成功，Excel已作为附件添加！")
             
         except Exception as e:
             print("运行时错误:", e)
