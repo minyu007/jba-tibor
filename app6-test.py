@@ -266,25 +266,16 @@ if __name__ == "__main__":
                 pandas_options={'header': 4}
             )
 
-            # date_array_by_position = df.iloc[:, 0].values
-                        
             dfs = [pd.DataFrame(table) for table in tables]
             dfs2 = [pd.DataFrame(table2) for table2 in tables2]
-
-            # print(dfs2)
-            
+            print(dfs)
+            print(dfs2)
             date_array_by_position = []
-            print("读取的表格数量:", len(dfs2))
             for i, df2 in enumerate(dfs2):
-                print(f"表格 {i} 的形状: {df2.shape}")
-                print(f"表格 {i} 的内容:")
-                # print(df2)
                 date_array_by_position = df2.iloc[:, 0].values
-                print("---")
 
             date_list = [s.split()[0] for s in date_array_by_position]
             
-            # print(date_list)
             
             df = pd.concat(dfs, ignore_index=True)
 
@@ -306,7 +297,6 @@ if __name__ == "__main__":
                 '12MONTH']
             df['Date'] = date_list
 
-            print(df)
             df = df.drop([0, 1])
             df = split_row_to_rows(df)
             
