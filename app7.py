@@ -269,13 +269,18 @@ if __name__ == "__main__":
             filename = f"{current_date}.pdf"
             
             save_file(pdf_url, filename)
+
+            # tables = tabula.read_pdf(
+            #     filename,
+            #     pages="all",
+            #     multiple_tables=False,
+            #     lattice=True, 
+            #     guess=False
+            # )
             
             tables = tabula.read_pdf(
                 filename,
-                pages="all",
-                multiple_tables=False,
-                lattice=True, 
-                guess=False
+                pages="all"
             )
 
             tables2 = tabula.read_pdf(
@@ -284,7 +289,7 @@ if __name__ == "__main__":
                 multiple_tables=False,
                 stream=True, 
                 guess=False,
-                pandas_options={'header': 4}
+                pandas_options={'header': 5}
             )
 
             dfs = [pd.DataFrame(table) for table in tables]
@@ -297,8 +302,10 @@ if __name__ == "__main__":
             date_list = [s.split()[0] for s in date_array_by_position]
             
             df = pd.concat(dfs, ignore_index=True)
-            
+            # print(df.columns)
+            print(df)
             df.columns=[
+                'Date',
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
@@ -313,7 +320,7 @@ if __name__ == "__main__":
                 '11MONTH',
                 '12MONTH']
             df = split_row_to_rows(df)
-            df.insert(0, 'Date', date_list)
+            # df.insert(0, 'Date', date_list)
 
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
@@ -342,9 +349,9 @@ if __name__ == "__main__":
             df.fillna(0, inplace=True)
             
             sender_email = "chengguoyu_82@163.com"
-            sender_password = "DUigKtCtMXw34MnB"
+            # sender_password = "DUigKtCtMXw34MnB"
             recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com", "chengguoyu_82@163.com"]
-            # recipient_emails = ["wo_oplove@163.com"]
+            recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
             
             body = f"<p>Download PDF <a href='{pdf_url}' target='_blank'>click me!</a></p><br/><p>If you would like to see all the data, please check the Excel file in the attachment. </p><br/><div>{html_table}</div><br/>"
