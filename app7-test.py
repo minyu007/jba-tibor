@@ -269,6 +269,14 @@ if __name__ == "__main__":
             filename = f"{current_date}.pdf"
             
             save_file(pdf_url, filename)
+
+            # tables = tabula.read_pdf(
+            #     filename,
+            #     pages="all",
+            #     multiple_tables=False,
+            #     lattice=True, 
+            #     guess=False
+            # )
             
             tables = tabula.read_pdf(
                 filename,
@@ -297,6 +305,7 @@ if __name__ == "__main__":
             # print(df.columns)
             print(df)
             df.columns=[
+                'Date',
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
@@ -311,7 +320,7 @@ if __name__ == "__main__":
                 '11MONTH',
                 '12MONTH']
             df = split_row_to_rows(df)
-            df.insert(0, 'Date', date_list)
+            # df.insert(0, 'Date', date_list)
 
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
