@@ -349,7 +349,7 @@ if __name__ == "__main__":
             df.fillna(0, inplace=True)
             
             sender_email = "chengguoyu_82@163.com"
-            # sender_password = "DUigKtCtMXw34MnB"
+            sender_password = "DUigKtCtMXw34MnB"
             recipient_emails = ["zling@jenseninvest.com","hwang@jenseninvest.com", "yqguo@jenseninvest.com", "13889632722@163.com", "chengguoyu_82@163.com"]
             # recipient_emails = ["wo_oplove@163.com"]
             subject = "Japanese Yen TIBOR"
