@@ -276,7 +276,7 @@ if __name__ == "__main__":
                 multiple_tables=False,
                 lattice=True, 
                 guess=False,
-                andas_options={'header': 5}
+                pandas_options={'header': 5}
             )
 
             tables2 = tabula.read_pdf(
