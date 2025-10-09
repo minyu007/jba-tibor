@@ -275,7 +275,8 @@ if __name__ == "__main__":
                 pages="all",
                 multiple_tables=False,
                 lattice=True, 
-                guess=False
+                guess=False,
+                andas_options={'header': 5}
             )
 
             tables2 = tabula.read_pdf(
@@ -284,7 +285,7 @@ if __name__ == "__main__":
                 multiple_tables=False,
                 stream=True, 
                 guess=False,
-                pandas_options={'header': 6}
+                pandas_options={'header': 5}
             )
 
             dfs = [pd.DataFrame(table) for table in tables]
