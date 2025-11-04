@@ -320,7 +320,7 @@ if __name__ == "__main__":
                 '11MONTH',
                 '12MONTH']
             df = split_row_to_rows(df)
-            # df.insert(0, 'Date', date_list)
+            df.insert(0, 'Date', date_list)
 
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
