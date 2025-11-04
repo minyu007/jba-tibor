@@ -258,12 +258,13 @@ if __name__ == "__main__":
             )
             
             dfs = [pd.DataFrame(table) for table in tables]
-            print(dfs)
+            print('dfs:', dfs)
             # print(df)
             df = pd.concat(dfs, ignore_index=True)
-            print(df.columns)
-            print(df)
+            print('df.columns: ', df.columns)
+            print('df: ', df)
             df.columns=[
+                'Date',
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
@@ -279,8 +280,8 @@ if __name__ == "__main__":
                 '12MONTH'
                ]
 
-            print(df.columns)
-            print(df)
+            print('df.columns: ', df.columns)
+            print('df: ', df)
             # df = df.drop([0, 1])
             df = split_row_to_rows(df)
 
