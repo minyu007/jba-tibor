@@ -305,7 +305,6 @@ if __name__ == "__main__":
             # print(df.columns)
             print(df)
             df.columns=[
-                'Date',
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
