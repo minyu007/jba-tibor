@@ -289,7 +289,7 @@ if __name__ == "__main__":
                 multiple_tables=False,
                 stream=True, 
                 guess=False,
-                pandas_options={'header': 5}
+                pandas_options={'header': 4}
             )
 
             dfs = [pd.DataFrame(table) for table in tables]
@@ -298,12 +298,14 @@ if __name__ == "__main__":
             date_array_by_position = []
             for i, df2 in enumerate(dfs2):
                 date_array_by_position = df2.iloc[:, 0].values
+                
             print('301 date_array_by_position', date_array_by_position)
             date_list = [s.split()[0] for s in date_array_by_position]
             
             df = pd.concat(dfs, ignore_index=True)
             print('305 df.columns', df.columns)
             print('306 df', df)
+            
             df.columns=[
                 '1WEEK',
                 '1MONTH',
@@ -324,7 +326,6 @@ if __name__ == "__main__":
             print('324 df', df)
             
             df.insert(0, 'Date', date_list)
-
             print('328 df', df)
 
             # Convert Date column to datetime if it's not already
