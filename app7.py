@@ -321,7 +321,11 @@ if __name__ == "__main__":
 
             
             df = split_row_to_rows(df)
+            print('324 df', df)
+            
             df.insert(0, 'Date', date_list)
+
+            print('328 df', df)
 
             # Convert Date column to datetime if it's not already
             df['Date'] = pd.to_datetime(df['Date'])
