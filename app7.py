@@ -302,7 +302,7 @@ if __name__ == "__main__":
             date_list = [s.split()[0] for s in date_array_by_position]
             
             df = pd.concat(dfs, ignore_index=True)
-            # print(df.columns)
+            print(df.columns)
             print(df)
             df.columns=[
                 '1WEEK',
