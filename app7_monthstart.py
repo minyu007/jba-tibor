@@ -275,7 +275,8 @@ if __name__ == "__main__":
                 pages="all",
                 multiple_tables=False,
                 lattice=True, 
-                guess=False
+                guess=False,
+                pandas_options={'header': 4}
             )
             
             # tables = tabula.read_pdf(
