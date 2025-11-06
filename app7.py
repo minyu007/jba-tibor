@@ -289,7 +289,7 @@ if __name__ == "__main__":
                 multiple_tables=False,
                 stream=True, 
                 guess=False,
-                pandas_options={'header': 4}
+                pandas_options={'header': 5}
             )
 
             dfs = [pd.DataFrame(table) for table in tables]
