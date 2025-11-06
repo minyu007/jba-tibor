@@ -308,7 +308,7 @@ if __name__ == "__main__":
             print('306 df', df)
             
             df.columns=[
-                'Date'
+                'Date',
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
