@@ -308,6 +308,7 @@ if __name__ == "__main__":
             print('306 df', df)
             
             df.columns=[
+                'Date'
                 '1WEEK',
                 '1MONTH',
                 '2MONTH',
@@ -326,7 +327,7 @@ if __name__ == "__main__":
             df = split_row_to_rows(df)
             print('324 df', df)
             
-            df.insert(0, 'Date', date_list)
+            # df.insert(0, 'Date', date_list)
             print('328 df', df)
 
             # Convert Date column to datetime if it's not already
